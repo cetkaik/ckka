@@ -1,6 +1,6 @@
-# CKKAファイルの仕様
+# CKKAファイルの仕様（書きかけ）
 
-2020年10月15日 jekto.vatimeliju
+2020年10月15日に書きはじめた jekto.vatimeliju
 
 ## 概要
 
