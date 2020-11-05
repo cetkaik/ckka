@@ -1,3 +1,10 @@
+type Header = Vec<HeaderElem>;
+
+enum HeaderElem {
+    Value(String),
+    KeyedValue(String, String)
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
