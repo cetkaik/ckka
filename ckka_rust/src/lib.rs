@@ -1,4 +1,12 @@
-type Header = Vec<HeaderElem>;
+struct Header {
+    info: Vec<HeaderElem>,
+    players: Option<(PlayerAndPoint, PlayerAndPoint)>
+}
+
+struct PlayerAndPoint {
+    player_name: String,
+    point: i64
+}
 
 enum HeaderElem {
     Value(String),
