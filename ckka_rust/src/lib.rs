@@ -1,3 +1,4 @@
+#[warn(clippy::pedantic)]
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Header {
     info: Vec<HeaderElem>,
@@ -47,10 +48,10 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, ()> {
         }
 
         if is_body {
-            body.push_str(&mut l.clone());
+            body.push_str(&l);
             body.push('\n');
         } else {
-            header.push_str(&mut l.clone());
+            header.push_str(&l);
             header.push('\n');
         }
     }
@@ -86,7 +87,7 @@ pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &s
 
     let (no_used, _) = skip_spaces_and_newlines(no_used)?;
 
-    if in_string.contains("\n") || in_string.contains("\r") {
+    if in_string.contains('\n') || in_string.contains('\r') {
         panic!("neither key nor value in the header can contain a newline");
     }
 
@@ -122,24 +123,24 @@ pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> 
         no_used,
         (
             player_name.to_owned(),
-            match &v.as_slice() {
-                &[] => None,
-                &[num] => Some(*num),
+            match v.as_slice() {
+                [] => None,
+                [num] => Some(*num),
                 _ => unreachable!(),
             },
         ),
     ))
 }
 
-pub fn header_parser(s: &str) -> IResult<&str, Header> {
-    let (no_used, _) = skip_spaces_and_newlines(s)?;
+pub fn header_parser(input: &str) -> IResult<&str, Header> {
+    let (no_used, _) = skip_spaces_and_newlines(input)?;
     let (no_used, info) = many0(header_elem_parser)(no_used)?;
     let (no_used, vec2) = many_m_n(0, 2, player_and_point_parser)(no_used)?;
-    let players = match &vec2.as_slice() {
-        &[] => None,
-        &[q, r] => {
-            let (a, p1) = q.clone();
-            let (c, p2) = r.clone();
+    let players = match vec2.as_slice() {
+        [] => None,
+        [q, r] => {
+            let (n1, p1) = q.clone();
+            let (n2, p2) = r.clone();
             let (p1, p2) = match (p1, p2) {
                 (Some(b), Some(d)) => (b, d),
                 (Some(b), None) => (b, 40 - b),
@@ -149,11 +150,11 @@ pub fn header_parser(s: &str) -> IResult<&str, Header> {
 
             Some((
                 PlayerAndPoint {
-                    player_name: a,
+                    player_name: n1,
                     point: p1,
                 },
                 PlayerAndPoint {
-                    player_name: c,
+                    player_name: n2,
                     point: p2,
                 },
             ))

@@ -53,8 +53,8 @@ fn less_than_100_nun1_elided(s: &[char]) -> Option<i64> {
     }
 }
 
-fn less_than_100000000(s: &[char]) -> Option<i64> {
-    match s {
+fn less_than_100000000(input: &[char]) -> Option<i64> {
+    match input {
         ['万'] => Some(10000),
         [head @ .., '万'] => less_than_10000(head).map(|w| w * 10000),
         ['万', tail @ ..] => Some(10000 + less_than_10000(tail)?),
@@ -72,7 +72,7 @@ fn less_than_100000000(s: &[char]) -> Option<i64> {
         [a, b, c, d, e, '万', tail @ ..] => {
             Some(less_than_10000(&[*a, *b, *c, *d, *e])? * 10000 + less_than_10000(tail)?)
         }
-        _ => less_than_10000(s)
+        _ => less_than_10000(input)
     }
 }
 
