@@ -1,12 +1,14 @@
 [package]
-name = "ckka_rust"
-version = "0.1.0"
 authors = ["sozysozbot <sozysozbot@gmail.com>"]
 edition = "2018"
+name = "ckka_rust"
+version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-big_s="1.0.2"
-nom = {version ="6.0.0", features =["alloc"]}
+big_s = "1.0.2"
+lazy_static = "1.4.0"
 maplit = "1.0.2"
+nom = {version = "6.0.0", features = ["alloc"]}
+regex = "1.4.2"
