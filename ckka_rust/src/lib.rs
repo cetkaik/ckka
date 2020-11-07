@@ -58,6 +58,7 @@ pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
         let first = splitter.next().unwrap();
         let second = splitter.next();
         match (first, second) {
+            ("", Some(val)) => HeaderElem::Value(val.to_owned()),
             (key, Some(value)) => HeaderElem::KeyedValue(key.to_owned(), value.to_owned()),
             (val, None) => HeaderElem::Value(val.to_owned()),
         }
