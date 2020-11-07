@@ -23,16 +23,9 @@ use nom::multi::many0;
 use nom::multi::many_m_n;
 use nom::IResult;
 
-use std::collections::HashMap;
-
-pub fn parse_braced_string(
-    s: &str,
-    open_close: HashMap<char, char>,
-) -> IResult<&str, (&str, (char, char))> {
+pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &str> {
     let (no_used, vec) = many0(char('#'))(s)?;
-    let (no_used, open) = one_of(&*open_close.keys().collect::<String>())(no_used)?;
-
-    let close = *open_close.get(&open).unwrap();
+    let (no_used, _) = char(open)(no_used)?;
 
     // `}####` if vec.len() == 4
     let end_pattern = format!(
@@ -45,14 +38,11 @@ pub fn parse_braced_string(
 
     let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(no_used)?;
 
-    Ok((no_used, (in_string, (open, close))))
+    Ok((no_used, in_string))
 }
 
 pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
-    let (no_used, (in_string, (open, close))) =
-        parse_braced_string(s, maplit::hashmap! {'{' => '}'})?;
-    assert_eq!(open, '{');
-    assert_eq!(close, '}');
+    let (no_used, in_string) = parse_braced_string(s, '{', '}')?;
     Ok((no_used, {
         let mut splitter = in_string.splitn(2, ':');
         let first = splitter.next().unwrap();
@@ -67,10 +57,7 @@ pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
 
 pub fn player_and_point_parser(s: &str) -> IResult<&str, PlayerAndPoint> {
     // TODO implement parsing point
-    let (no_used, (player_name, (open, close))) =
-        parse_braced_string(s, maplit::hashmap! {'[' => ']'})?;
-    assert_eq!(open, '[');
-    assert_eq!(close, ']');
+    let (no_used, player_name) = parse_braced_string(s, '[', ']')?;
 
     Ok((
         no_used,
@@ -90,7 +77,7 @@ pub fn header_parser(s: &str) -> IResult<&str, Header> {
     let players = match &vec2.as_slice() {
         &[] => None,
         &[a, b] => Some((a.clone(), b.clone())),
-        _ => panic!("only one player!"),
+        _ => panic!("only one player found!"),
     };
 
     Ok((no_used, Header { info, players }))
