@@ -88,56 +88,30 @@ pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> 
 pub fn header_parser(s: &str) -> IResult<&str, Header> {
     let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(s)?;
     let (no_used, info) = many0(header_elem_parser)(no_used)?;
-
     let (no_used, vec2) = many_m_n(0, 2, player_and_point_parser)(no_used)?;
-
     let players = match &vec2.as_slice() {
         &[] => None,
-        &[q, r] => match (q.clone(), r.clone()) {
-            ((a, Some(b)), (c, Some(d))) => Some((
-                PlayerAndPoint {
-                    player_name: a,
-                    point: b,
-                },
-                PlayerAndPoint {
-                    player_name: c,
-                    point: d,
-                },
-            )),
+        &[q, r] => {
+            let (a, p1) = q.clone();
+            let (c, p2) = r.clone();
+            let (p1, p2) = match (p1, p2) {
+                (Some(b), Some(d)) => (b, d),
+                (Some(b), None) => (b, 40 - b),
+                (None, Some(d)) => (40 - d, d),
+                (None, None) => (20, 20),
+            };
 
-            ((a, Some(b)), (c, None)) => Some((
+            Some((
                 PlayerAndPoint {
                     player_name: a,
-                    point: b,
+                    point: p1,
                 },
                 PlayerAndPoint {
                     player_name: c,
-                    point: 40 - b,
+                    point: p2,
                 },
-            )),
-
-            ((a, None), (c, Some(d))) => Some((
-                PlayerAndPoint {
-                    player_name: a,
-                    point: 40 - d,
-                },
-                PlayerAndPoint {
-                    player_name: c,
-                    point: d,
-                },
-            )),
-
-            ((a, None), (c, None)) => Some((
-                PlayerAndPoint {
-                    player_name: a,
-                    point: 20,
-                },
-                PlayerAndPoint {
-                    player_name: c,
-                    point: 20,
-                },
-            )),
-        },
+            ))
+        }
         _ => panic!("only one player found!"),
     };
 
