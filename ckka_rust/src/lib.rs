@@ -84,7 +84,7 @@ pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &s
     let (no_used, in_string) = take_until(&*end_pattern)(no_used)?;
     let (no_used, _) = tag(&*end_pattern)(no_used)?;
 
-    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(no_used)?;
+    let (no_used, _) = skip_spaces_and_newlines(no_used)?;
 
     if in_string.contains("\n") || in_string.contains("\r") {
         panic!("neither key nor value in the header can contain a newline");
@@ -107,12 +107,17 @@ pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
     }))
 }
 
+fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
+    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(s)?;
+    Ok((no_used, ()))
+}
+
 pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> {
     // TODO implement parsing point
     let (no_used, player_name) = parse_braced_string(s, '[', ']')?;
-    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(no_used)?;
+    let (no_used, _) = skip_spaces_and_newlines(no_used)?;
     let (no_used, v) = many_m_n(0, 1, parse_pekzep_numeral)(no_used)?;
-    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(no_used)?;
+    let (no_used, _) = skip_spaces_and_newlines(no_used)?;
     Ok((
         no_used,
         (
@@ -127,7 +132,7 @@ pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> 
 }
 
 pub fn header_parser(s: &str) -> IResult<&str, Header> {
-    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(s)?;
+    let (no_used, _) = skip_spaces_and_newlines(s)?;
     let (no_used, info) = many0(header_elem_parser)(no_used)?;
     let (no_used, vec2) = many_m_n(0, 2, player_and_point_parser)(no_used)?;
     let players = match &vec2.as_slice() {
