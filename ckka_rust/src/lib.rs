@@ -23,6 +23,16 @@ use nom::multi::many0;
 use nom::multi::many_m_n;
 use nom::IResult;
 
+mod pekzep_numeral;
+
+pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
+    let (no_used, vec) = many0(one_of("無下一二三四五六七八九十百万億"))(s)?;
+    match pekzep_numeral::analyze(&vec) {
+        Some(n) => Ok((no_used, n)),
+        None => panic!("unparsable pekzep numeral `{}`", s),
+    }
+}
+
 pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &str> {
     let (no_used, vec) = many0(char('#'))(s)?;
     let (no_used, _) = char(open)(no_used)?;
