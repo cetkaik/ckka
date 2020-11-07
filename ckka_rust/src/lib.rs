@@ -26,16 +26,25 @@ use nom::character::complete::*;
 use nom::multi::many0;
 use nom::IResult;
 
-pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
+pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &str> {
     let (no_used, vec) = many0(char('#'))(s)?;
-    let (no_used, _) = char('{')(no_used)?;
+    let (no_used, _) = char(open)(no_used)?;
 
     // `}####` if vec.len() == 4
-    let end_pattern = format!("}}{}", (0..vec.len()).map(|_| "#").collect::<String>());
+    let end_pattern = format!(
+        "{}{}",
+        close,
+        (0..vec.len()).map(|_| "#").collect::<String>()
+    );
     let (no_used, in_string) = take_until(&*end_pattern)(no_used)?;
     let (no_used, _) = tag(&*end_pattern)(no_used)?;
 
-    let ans = {
+    Ok((no_used, in_string))
+}
+
+pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
+    let (no_used, in_string) = parse_braced_string(s, '{', '}')?;
+    Ok((no_used, {
         let mut splitter = in_string.splitn(2, ':');
         let first = splitter.next().unwrap();
         let second = splitter.next();
@@ -43,8 +52,7 @@ pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
             (key, Some(value)) => HeaderElem::KeyedValue(key.to_owned(), value.to_owned()),
             (val, None) => HeaderElem::Value(val.to_owned()),
         }
-    };
-    Ok((no_used, ans))
+    }))
 }
 
 #[cfg(test)]
