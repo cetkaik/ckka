@@ -49,6 +49,10 @@ pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &s
 
     let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(no_used)?;
 
+    if in_string.contains("\n") || in_string.contains("\r")  {
+        panic!("neither key nor value in the header can contain a newline");
+    }
+
     Ok((no_used, in_string))
 }
 
