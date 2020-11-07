@@ -34,6 +34,22 @@ fn header_elem_4() {
 }
 
 #[test]
+fn it_works3() {
+    assert_eq!(
+        header_parser(
+            r#"{:2018年4月8日 01:30頃}
+[JV]二十一 [SY]十九"#
+        ),
+        Ok(("", Header { info: vec![
+            HeaderElem::Value(S("2018年4月8日 01:30頃"))
+        ], players: Some((
+            PlayerAndPoint{ player_name: S("JV"), point: 21},
+            PlayerAndPoint{ player_name: S("SY"), point: 19},
+        )) }))
+    )
+}
+
+#[test]
 fn it_works2() {
     assert_eq!(
         header_parser(
@@ -76,7 +92,7 @@ fn it_works() {
             Header {
                 info: vec![
                     HeaderElem::KeyedValue(S("律"), S("硬皇力")),
-                    HeaderElem::KeyedValue(S("2018年4月8日 18"),S("00頃"))
+                    HeaderElem::KeyedValue(S("2018年4月8日 18"), S("00頃"))
                 ],
                 players: Some((
                     PlayerAndPoint {

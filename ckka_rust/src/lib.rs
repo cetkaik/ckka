@@ -26,7 +26,8 @@ use nom::IResult;
 mod pekzep_numeral;
 
 pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
-    let (no_used, vec) = many0(one_of("無下一二三四五六七八九十百万億"))(s)?;
+    let (no_used, vec) =
+        many_m_n(1, 1000, one_of("無下一二三四五六七八九十百万億"))(s)?;
     match pekzep_numeral::analyze(&vec) {
         Some(n) => Ok((no_used, n)),
         None => panic!("unparsable pekzep numeral `{}`", s),
@@ -65,16 +66,22 @@ pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
     }))
 }
 
-pub fn player_and_point_parser(s: &str) -> IResult<&str, PlayerAndPoint> {
+pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> {
     // TODO implement parsing point
     let (no_used, player_name) = parse_braced_string(s, '[', ']')?;
-
+    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(no_used)?;
+    let (no_used, v) = many_m_n(0, 1, parse_pekzep_numeral)(no_used)?;
+    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(no_used)?;
     Ok((
         no_used,
-        PlayerAndPoint {
-            player_name: player_name.to_owned(),
-            point: 20, /* FIXME */
-        },
+        (
+            player_name.to_owned(),
+            match &v.as_slice() {
+                &[] => None,
+                &[num] => Some(*num),
+                _ => unreachable!(),
+            },
+        ),
     ))
 }
 
@@ -86,7 +93,51 @@ pub fn header_parser(s: &str) -> IResult<&str, Header> {
 
     let players = match &vec2.as_slice() {
         &[] => None,
-        &[a, b] => Some((a.clone(), b.clone())),
+        &[q, r] => match (q.clone(), r.clone()) {
+            ((a, Some(b)), (c, Some(d))) => Some((
+                PlayerAndPoint {
+                    player_name: a,
+                    point: b,
+                },
+                PlayerAndPoint {
+                    player_name: c,
+                    point: d,
+                },
+            )),
+
+            ((a, Some(b)), (c, None)) => Some((
+                PlayerAndPoint {
+                    player_name: a,
+                    point: b,
+                },
+                PlayerAndPoint {
+                    player_name: c,
+                    point: 40 - b,
+                },
+            )),
+
+            ((a, None), (c, Some(d))) => Some((
+                PlayerAndPoint {
+                    player_name: a,
+                    point: 40 - d,
+                },
+                PlayerAndPoint {
+                    player_name: c,
+                    point: d,
+                },
+            )),
+
+            ((a, None), (c, None)) => Some((
+                PlayerAndPoint {
+                    player_name: a,
+                    point: 20,
+                },
+                PlayerAndPoint {
+                    player_name: c,
+                    point: 20,
+                },
+            )),
+        },
         _ => panic!("only one player found!"),
     };
 
