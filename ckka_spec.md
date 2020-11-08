@@ -45,23 +45,47 @@ U+002C（カンマ）、U+002E（ピリオド）、U+3001（読点）、U+3002�
 ## ボディ部
 `K`, `L`, `N`, `T`, `Z`, `X`, `C`, `M`, `P`, `"` のどれかが行頭（ただしスペースを無視して考える）にある行に遭遇した段階でヘッダ部は終了し、残りはボディ部となる。
 
+ボディ部は「移動要素」と「ゲーム進行要素」の2種類から構成される列である。
+
 環境側は、以下の「表記法⓪」をサポートしなくてはならない。「表記法①」以降の記法をサポートしてもよいが、これはoptionalである。
 
 ### 表記法⓪
 
-移動まわりと役まわりがある。各々はスペースまたは改行によって分断するのが普通であるが、句読点での分断も許される。
+各々の移動要素とゲーム進行要素はスペースまたは改行によって分断するのが普通であるが、句読点での分断も許される。
+
 持ち駒を打つのでなければ、`兵` などの職業名の代わりに `片` と書くことを許容する。
+
+以下構文を[EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)で表記する。
+
+```ebnf
+column = "K" | "L" | "N" | "T" | "Z" | "X" | "C" | "M" | "P";
+row = "A" | "E" | "I" | "U" |"O" | "Y" |"AI" | "AU" | "IA";
+square = column, row;
+water-square = "NO" | "TO" | "ZO" | "XO" | "CO" | "ZI" | "ZU" | "ZY" | "ZAI";
+non-vessel = "兵" | "弓" | "車" | "虎" | "馬" | "筆" | "巫" | "将" | "王";
+piece = "船" | non-vessel;
+piece-or-wildcard = piece | "片";
+non-vessel-or-wildcard = non-vessel | "片";
+water-stick = "水" , ("或" | "或此無" | "無此無" | "一此無" | "二此無" | "三" | "四" | "五");
+bridge-stick = "橋", ("或" | "無" | "一" | "二" | "三" | "四" | "五");
+sqbracket = "[", (square | "或"), "]";
+```
 
 #### 移動―踏越えなし判定なし
 
-`[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)[船兵弓車虎馬筆巫将王片][KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)無撃裁`
+```ebnf
+no-step-and-no-stick = square, piece-or-wildcard, square, "無撃裁";
+```
 
 |     構文     |  意味     |
 |--------------|-----------|
 | `XU兵XY無撃裁` | XUの兵がXYに移動した。裁は必要なく、したがって判定はしていない。 |
 
 #### 移動―踏越えなし入水判定あり
-`[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)[兵弓車虎馬筆巫将王片](NO|TO|ZO|XO|CO|ZI|ZU|ZY|ZAI)水[或無一二三四五](此無)?`
+
+```ebnf
+no-step-and-water-stick = square, non-vessel-or-wildcard, water-square, water-stick;
+```
 
 |     構文     |  意味     |
 |--------------|-----------|
@@ -72,21 +96,30 @@ U+002C（カンマ）、U+002E（ピリオド）、U+3001（読点）、U+3002�
 | `LY弓ZY水或`   | LYの弓がZYに入水しようとした。裁は不明だが入水判定に成功した。|
 
 #### 移動―踏越えあり判定なし
-`[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)[船兵弓車虎馬筆巫将王片][KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)無撃裁`
+
+```ebnf
+step-and-no-stick = square, piece-or-wildcard, square, square, "無撃裁"; 
+```
 
 |     構文     |  意味     |
 |--------------|-----------|
 | `XU兵XYXAU無撃裁` | XUの兵がXYを踏んでXAUに移動した。裁は必要なく、したがって判定はしていない。 |
 
 #### 移動―踏越えあり無限移動判定なし入水判定あり
-`[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)[兵弓車虎馬筆巫将王片][KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)(NO|TO|ZO|XO|CO|ZI|ZU|ZY|ZAI)水[或無一二三四五](此無)?`
+
+```ebnf
+step-and-water-stick = square, non-vessel-or-wildcard, square, water-square, water-stick;
+```
 
 |     構文     |  意味     |
 |--------------|-----------|
 | `NY巫CYCO水五`   | NYの巫がCYを踏んで、COに入水しようとし、五を出し入水判定に成功した。|
 
 #### 移動―踏越えあり無限移動判定あり入水判定なし及び未到達
-`[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)[船兵弓車虎馬筆巫将王片][KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)橋[或無一二三四五](此無)?`
+
+```ebnf
+step-and-bridge-stick = square, piece-or-wildcard, square, square, bridge-stick, [ "此無" ];
+```
 
 |     構文     |  意味     |
 |--------------|-----------|
@@ -97,14 +130,20 @@ U+002C（カンマ）、U+002E（ピリオド）、U+3001（読点）、U+3002�
 | `ME弓MIMY橋無此無` | MEの弓がMIを踏んでMYに進もうとした。ゼロが出たので判定に失敗している。 |
 
 #### 移動―踏越えあり無限移動判定あり入水判定あり
-`[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)[兵弓車虎馬筆巫将王片][KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)(NO|TO|ZO|XO|CO|ZI|ZU|ZY|ZAI)橋[或無一二三四五]水[或無一二三四五](此無)?`
+
+```ebnf
+step-and-bridge-stick-and-water-stick = square, no-vessel-or-wildcard, square, water-square, bridge-stick, water-stick;
+```
 
 |     構文     |  意味     |
 |--------------|-----------|
 | `LO弓NOCO橋四水五`   | LOの弓がNOを踏んで、四を出してCOに入水しようとし、五を出し入水判定に成功した。|
 
 #### 移動―手駒からの打ち込み
-`[或黒赤][船兵弓車虎馬筆巫将王][KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)`
+
+```ebnf
+parachute = ("或" | "黒" | "赤"), piece, square;
+```
 
 |     構文     |  意味     |
 |--------------|-----------|
@@ -113,18 +152,24 @@ U+002C（カンマ）、U+002E（ピリオド）、U+3001（読点）、U+3002�
 
 #### 移動―皇が駒を踏まずに移動し移動
 
-`[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)皇(\[[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)\])?[KLNTZXCMP](IA|AI|AU|A|E|I|U|O|Y)`
+```ebnf
+tam-no-step = square, "皇", [ sqbracket ], square;
+```
 
 皇は決して裁を要求しないので、`無撃裁`を書かない。
 
 |     構文     |  意味     |
 |--------------|-----------|
 | `KE皇KI` | KEの皇がどこかに行き、そのあとKIに移動した。|
+| `KE皇[或]KI` | KEの皇がどこかに行き、そのあとKIに移動した（`KE皇KI`と同じ）。|
 | `KE皇[LE]KI` | KEの皇がLEに行き、そのあとKIに移動した。|
 
 #### 移動―皇が駒を踏んで移動
 
-`[KLNTZXCMP](AI|AU|IA|A|E|I|U|O|Y)皇(((\[或\]|\[([KLNTZXCMP](A|E|I|U|O|Y|AI|AU|IA))\])?[KLNTZXCMP](AI|AU|IA|A|E|I|U|O|Y|))|([KLNTZXCMP](AI|AU|IA|A|E|I|U|O|Y|))(\[或\]|\[([KLNTZXCMP](A|E|I|U|O|Y|AI|AU|IA))\]))[KLNTZXCMP](AI|AU|IA|A|E|I|U|O|Y)`
+```ebnf
+mid = (sqbracket, square) | (square, [sqbracket]);
+tam-step = square, "皇", mid, square;
+```
 
 |     構文     |  意味     |
 |--------------|-----------|
