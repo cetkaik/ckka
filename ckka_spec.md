@@ -59,14 +59,15 @@ U+002C（カンマ）、U+002E（ピリオド）、U+3001（読点）、U+3002�
 
 ```ebnf
 column = "K" | "L" | "N" | "T" | "Z" | "X" | "C" | "M" | "P";
-row = "A" | "E" | "I" | "U" |"O" | "Y" |"AI" | "AU" | "IA";
+row = "A" | "E" | "I" | "U" | "O" | "Y" | "AI" | "AU" | "IA";
 square = column, row;
 water-square = "NO" | "TO" | "ZO" | "XO" | "CO" | "ZI" | "ZU" | "ZY" | "ZAI";
+non-water-square = square - water-square;
 non-vessel = "兵" | "弓" | "車" | "虎" | "馬" | "筆" | "巫" | "将" | "王";
 piece = "船" | non-vessel;
 piece-or-wildcard = piece | "片";
 non-vessel-or-wildcard = non-vessel | "片";
-water-stick = "水" , ("或" | "或此無" | "無此無" | "一此無" | "二此無" | "三" | "四" | "五");
+water-stick = "水", ("或" | "或此無" | "無此無" | "一此無" | "二此無" | "三" | "四" | "五");
 bridge-stick = "橋", ("或" | "無" | "一" | "二" | "三" | "四" | "五");
 sqbracket = "[", (square | "或"), "]";
 ```
@@ -84,7 +85,7 @@ no-step-and-no-stick = square, piece-or-wildcard, square, "無撃裁";
 #### 移動―踏越えなし入水判定あり
 
 ```ebnf
-no-step-and-water-stick = square, non-vessel-or-wildcard, water-square, water-stick;
+no-step-and-water-stick = non-water-square, non-vessel-or-wildcard, water-square, water-stick;
 ```
 
 |     構文     |  意味     |
@@ -108,7 +109,7 @@ step-and-no-stick = square, piece-or-wildcard, square, square, "無撃裁";
 #### 移動―踏越えあり無限移動判定なし入水判定あり
 
 ```ebnf
-step-and-water-stick = square, non-vessel-or-wildcard, square, water-square, water-stick;
+step-and-water-stick = non-water-square, non-vessel-or-wildcard, square, water-square, water-stick;
 ```
 
 |     構文     |  意味     |
@@ -132,7 +133,7 @@ step-and-bridge-stick = square, piece-or-wildcard, square, square, bridge-stick,
 #### 移動―踏越えあり無限移動判定あり入水判定あり
 
 ```ebnf
-step-and-bridge-stick-and-water-stick = square, no-vessel-or-wildcard, square, water-square, bridge-stick, water-stick;
+step-and-bridge-stick-and-water-stick = non-water-square, no-vessel-or-wildcard, square, water-square, bridge-stick, water-stick;
 ```
 
 |     構文     |  意味     |
@@ -184,35 +185,36 @@ tam-step = square, "皇", mid, square;
 再行は `[SY]為(獣)(同色馬弓兵) 再行` のように書く。終季は `[SY]為(行行)而手五 終季` のように書く。
 
 ### 表記法①
-例えば `CI兵XIXU` のように表記する。各々はスペースまたは改行によって分断するのが普通であるが、句読点での分断も許される。
-持ち駒を打つのでなければ、`兵` などの職業名の代わりに `片` と書くことを許容する。
 
-|     構文     |  意味     |
-|--------------|-----------|
-| `ME弓MIMU四` | MEの弓がMIを踏んでMUに進んだ。裁は四。 |
-| `ME弓MIMU` | MEの弓がMIを踏んでMUに進んだ。裁は不明だが判定に成功はしている。 |
-| `ME弓MIMY或` | MEの弓がMIを踏んでMYに進んだ。裁は不明だが判定に成功はしている。 |
-| `ME弓MIMY或ME` | MEの弓がMIを踏んでMYに進もうとした。裁は不明だが判定に失敗し、MEに戻った。 |
-| `ME弓MIMY無` | MEの弓がMIを踏んでMYに進もうとした。裁は不明だが判定に失敗し、MEに戻った。 |
-| `ME弓MIMY一此無` | MEの弓がMIを踏んでMYに進もうとした。一が出たので判定に失敗している。 |
-| `ME弓MIMY無此無` | MEの弓がMIを踏んでMYに進もうとした。ゼロが出たので判定に失敗している。 |
-| `LY弓ZY無`   | LYの弓がZYに入水しようとしたが、入水判定に失敗した。|
-| `LY弓ZY此無`   | LYの弓がZYに入水しようとしたが、入水判定に失敗した。|
-| `LY弓ZY一`   | LYの弓がZYに入水しようとしたが、一が出たので入水判定に失敗した。|
-| `LY弓ZY一此無`   | LYの弓がZYに入水しようとしたが、一が出たので入水判定に失敗した。|
-| `LY弓ZY一LY`   | LYの弓がZYに入水しようとしたが、一が出たので入水判定に失敗した。|
-| `LY弓ZY無此無`   | LYの弓がZYに入水しようとしたが、ゼロが出たので入水判定に失敗した。|
-| `LO弓NOCO四五`   | LOの弓がNOを踏んで、四を出してCOに入水しようとし、五を出し入水判定に成功した。|
-| `黒弓MY`     | 黒の弓を手元からMYに打った。 |
-| `或車CI` | なんらかの色の車をCIに打った。|
-| `PAU皇CAIMAU` | PAUの皇がMAUに移動する途中でCAIを踏んだ。 |
-| `PAU皇[MAU]CAIMAU` | PAUの皇がMAUに行き、そのあとCAIを踏んでMAUに移動した。 |
+表記法⓪の簡略化であり、「無撃裁」「橋」「水」などをいちいち書かず、普段人間が書く棋譜になるべく合わせた記法である。
+
+|     構文     |  意味     | 対応する表記法⓪ |
+|--------------|-----------|----------------|
+| `XU兵XYXAU` | XUの兵がXYを踏んでXAUに移動した。裁は必要なく、したがって判定はしていない。 | `XU兵XYXAU無撃裁`
+| `ME弓MIMU四` | MEの弓がMIを踏んでMUに進んだ。裁は四。 | `ME弓MIMU橋四` |
+| `ME弓MIMU` | MEの弓がMIを踏んでMUに進んだ。裁は不明だが判定に成功はしている。 | `ME弓MIMU橋或` |
+| `ME弓MIMY或` | MEの弓がMIを踏んでMYに進んだ。裁は不明だが判定に成功はしている。 | `ME弓MIMY橋或` |
+| `ME弓MIMY或ME` | MEの弓がMIを踏んでMYに進もうとした。裁は不明だが判定に失敗し、MEに戻った。 | `ME弓MIMY橋或此無` |
+| `ME弓MIMY無` | MEの弓がMIを踏んでMYに進もうとした。裁は不明だが判定に失敗し、MEに戻った。 | `ME弓MIMY橋或此無` |
+| `ME弓MIMY一此無` | MEの弓がMIを踏んでMYに進もうとした。一が出たので判定に失敗している。 | `ME弓MIMY橋一此無`
+| `ME弓MIMY無此無` | MEの弓がMIを踏んでMYに進もうとした。ゼロが出たので判定に失敗している。 | `ME弓MIMY橋無此無` |
+| `LY弓ZY無`   | LYの弓がZYに入水しようとしたが、入水判定に失敗した。| `LY弓ZY水或此無`
+| `LY弓ZY此無`   | LYの弓がZYに入水しようとしたが、入水判定に失敗した。| `LY弓ZY水或此無`
+| `LY弓ZY一`   | LYの弓がZYに入水しようとしたが、一が出たので入水判定に失敗した。| `LY弓ZY水一此無`
+| `LY弓ZY一此無`   | LYの弓がZYに入水しようとしたが、一が出たので入水判定に失敗した。| `LY弓ZY水一此無`
+| `LY弓ZY一LY`   | LYの弓がZYに入水しようとしたが、一が出たので入水判定に失敗した。| `LY弓ZY水一此無`
+| `LY弓ZY無此無`   | LYの弓がZYに入水しようとしたが、ゼロが出たので入水判定に失敗した。| `LY弓ZY水無此無`
+| `LO弓NOCO四五`   | LOの弓がNOを踏んで、四を出してCOに入水しようとし、五を出し入水判定に成功した。| `LO弓NOCO橋四水五`
+| `黒弓MY`     | 黒の弓を手元からMYに打った。 | `黒弓MY`
+| `或車CI` | なんらかの色の車をCIに打った。| `或車CI`
+| `PAU皇CAIMAU` | PAUの皇がMAUに移動する途中でCAIを踏んだ。 | `PAU皇CAIMAU`
+| `PAU皇[MAU]CAIMAU` | PAUの皇がMAUに行き、そのあとCAIを踏んでMAUに移動した。 | `PAU皇[MAU]CAIMAU`
 
 ### 表記法②
-例えば `TU dau2 XY` のように表記する。各々はピリオドによって区切られるのが普通であるが、句読点または改行によっても分断される。
+漢字転写表記である表記法①に対応する、パイグ音ベースでの表記法。例えば `TU dau2 XY` のように表記する。各々はピリオドによって区切られるのが普通であるが、句読点または改行によっても分断される。
 
 ### 表記法③
-例えば `"mauAmaimy1"` のように表記される。各々はJSONの仕様により規定される文字列リテラルから構成され、スペース、改行、または句読点（U+3002）によって分断される。
+例えば `"mauAmaimy1"` のように表記される。各々はJSONの仕様により規定される文字列リテラルから構成され、スペース、改行、または句読点（U+3002）によって分断される。[cerke_noterのフォーマット](https://github.com/schwert398/cerke_noter/wiki/Specification-of-note-in-machine-readable-format-%28MRF%29)との互換性を重視している。
 
 ## 例
 
