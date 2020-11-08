@@ -143,13 +143,13 @@ step-and-bridge-stick-and-water-stick = non-water-square, no-vessel-or-wildcard,
 #### 移動―手駒からの打ち込み
 
 ```ebnf
-parachute = ("或" | "黒" | "赤"), piece, square;
+parachute = ("黒" | "赤"), piece, square;
 ```
 
 |     構文     |  意味     |
 |--------------|-----------|
 | `黒弓MY`     | 黒の弓を手元からMYに打った。 |
-| `或車CI` | なんらかの色の車をCIに打った。|
+| `赤車CI` | 赤色の車をCIに打った。|
 
 #### 移動―皇が駒を踏まずに移動し移動
 
@@ -206,7 +206,7 @@ tam-step = square, "皇", mid, square;
 | `LY弓ZY無此無`   | LYの弓がZYに入水しようとしたが、ゼロが出たので入水判定に失敗した。| `LY弓ZY水無此無`
 | `LO弓NOCO四五`   | LOの弓がNOを踏んで、四を出してCOに入水しようとし、五を出し入水判定に成功した。| `LO弓NOCO橋四水五`
 | `黒弓MY`     | 黒の弓を手元からMYに打った。 | `黒弓MY`
-| `或車CI` | なんらかの色の車をCIに打った。| `或車CI`
+| `或車CI` | なんらかの色の車をCIに打った（状況から色が判断できない場合はエラー）。| `黒車CI` または `赤車CI`
 | `PAU皇CAIMAU` | PAUの皇がMAUに移動する途中でCAIを踏んだ。 | `PAU皇CAIMAU`
 | `PAU皇[MAU]CAIMAU` | PAUの皇がMAUに行き、そのあとCAIを踏んでMAUに移動した。 | `PAU皇[MAU]CAIMAU`
 
