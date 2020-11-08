@@ -115,6 +115,8 @@ pekzep-integer = '無' | [ '下' ], positive;
 
 各々の移動要素とゲーム進行要素はスペースまたは改行によって分断するのが普通であるが、句読点での分断も許される。
 
+移動要素は、以下の `no-step-and-no-stick`, `no-step-and-water-stick`, `step-and-no-stick`, `step-and-water-stick`, `step-and-bridge-stick`, `step-and-bridge-stick-and-water-stick`, `parachute`, `tam-no-step`, `tam-step` のどれか、およびその後に（それぞれの移動に対するコメントとして）`{` と `}` で囲まれた任意の文字列を追加したものである（前述と同様、 `#{` と `}#` などで囲まれていてもよい。）
+
 持ち駒を打つのでなければ、`兵` などの職業名の代わりに `片` と書くことを許容する。
 
 ```ebnf
