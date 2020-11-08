@@ -85,7 +85,7 @@ U+002C（カンマ）、U+002E（ピリオド）、U+3001（読点）、U+3002�
 
 それ以上は、例えば 2,147,483,647 は `二十一億四七百四八万三六百四七` である。
 
-構文を[EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)で表記すると、以下の通りである。
+[EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)で表記するなら、以下の `pekzep-integer` 規則にマッチするものが認められる。
 
 ```ebnf
 less-than-ten = '一' | '二' | '三' | '四' | '五' | '六' | '七' | '八' | '九';
@@ -100,7 +100,7 @@ less-than-ten-thousand = [ elided ], '百', [ elided ]
     | less-than-hundred;
 less-than-hundred-million = [ less-than-ten-thousand ], '万', [ less-than-ten-thousand ] | less-than-ten-thousand;
 positive = [ less-than-hundred-million ], '億', [ less-than-hundred-million ] | less-than-hundred-million;
-numeral = '無' | [ '下' ], positive;
+pekzep-integer = '無' | [ '下' ], positive;
 ```
 
 ## ボディ部
