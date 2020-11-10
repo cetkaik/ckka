@@ -20,8 +20,10 @@ pub enum HeaderElem {
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_until;
 use nom::character::complete::*;
+use nom::error::*;
 use nom::multi::many0;
 use nom::multi::many_m_n;
+use nom::Err;
 use nom::IResult;
 
 pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
@@ -29,7 +31,7 @@ pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
         many_m_n(1, 1000, one_of("無下一二三四五六七八九十百万億"))(s)?;
     match super::pekzep_numeral::analyze(&vec) {
         Some(n) => Ok((no_used, n)),
-        None => panic!("unparsable pekzep numeral `{}`", s),
+        None => Err(Err::Error(Error::new(no_used, ErrorKind::Verify))), /* unparsable pekzep numeral */
     }
 }
 
@@ -49,7 +51,8 @@ pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &s
     let (no_used, _) = skip_spaces_and_newlines(no_used)?;
 
     if in_string.contains('\n') || in_string.contains('\r') {
-        panic!("neither key nor value in the header can contain a newline");
+        return Err(Err::Error(Error::new(no_used, ErrorKind::Verify)));
+        /* neither key nor value in the header can contain a newline */
     }
 
     Ok((no_used, in_string))
@@ -120,7 +123,7 @@ pub fn header_parser(input: &str) -> IResult<&str, Header> {
                 },
             ))
         }
-        _ => panic!("only one player found!"),
+        _ => return Err(Err::Error(Error::new(no_used, ErrorKind::Verify))), /* only one player found */
     };
 
     Ok((no_used, Header { info, players }))

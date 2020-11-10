@@ -2,7 +2,9 @@ use cetkaik_core::absolute;
 use nom::branch::alt;
 use nom::character::complete::*;
 use nom::combinator::map;
+use nom::error::*;
 use nom::multi::many_m_n;
+use nom::Err;
 use nom::IResult;
 
 type PossiblyUnknown<T> = Option<T>;
@@ -697,10 +699,11 @@ pub fn parse_water_stick(s: &str) -> IResult<&str, (PossiblyUnknown<i32>, bool)>
         ['五'] => (Some(5), true),
         ['或'] => (None, true), /* unspecified but successful */
         ['或', '此', '無'] => (None, false), /* unspecified but not successful */
-        _ => panic!(
+        _ => return Err(Err::Error(Error::new(rest, ErrorKind::Verify))),
+        /*(
             "Unparsable fragment {:?} while parsing water stick",
             vec.into_iter().collect::<String>()
-        ),
+        ),*/
     };
 
     Ok((rest, result))

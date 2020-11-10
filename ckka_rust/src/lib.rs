@@ -36,7 +36,7 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, ()> {
     match header::header_parser(&header) {
         Ok(("", parsed_head)) => Ok((parsed_head, body)),
         Ok((a, _)) => panic!("Unparsable fragment `{}` left", a),
-        Err(_) => Err(()),
+        Err(e) => panic!("Failed to parse header, with error {:?}", e),
     }
 }
 #[cfg(test)]
