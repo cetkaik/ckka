@@ -46,13 +46,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f4746ef194b8397a4fa6a3032a5db7ec64d335df547dd1a2ed1ee58f3a2da1d"
 
 [[package]]
-name = "cfg-if"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
-
-[[package]]
-name = "ckka_rust"
+name = "cetkaik_kiaak"
 version = "0.1.0"
 dependencies = [
  "big_s",
@@ -62,6 +56,12 @@ dependencies = [
  "nom",
  "regex",
 ]
+
+[[package]]
+name = "cfg-if"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 
 [[package]]
 name = "funty"
