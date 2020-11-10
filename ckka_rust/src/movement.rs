@@ -424,7 +424,7 @@ pub fn parse_movement(s: &str) -> IResult<&str, Move> {
 
 use nom::bytes::complete::tag;
 
-pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
+fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
     let (rest, dest) = parse_square(rest)?;
@@ -433,7 +433,7 @@ pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
     Ok((rest, Move::NoStepAndNoStick { src, prof, dest }))
 }
 
-pub fn parse_no_step_and_water_stick(s: &str) -> IResult<&str, Move> {
+fn parse_no_step_and_water_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
     let (rest, dest) = parse_square(rest)?;
@@ -451,7 +451,7 @@ pub fn parse_no_step_and_water_stick(s: &str) -> IResult<&str, Move> {
     ))
 }
 
-pub fn parse_step_and_no_stick(s: &str) -> IResult<&str, Move> {
+fn parse_step_and_no_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
     let (rest, step) = parse_square(rest)?;
@@ -469,7 +469,7 @@ pub fn parse_step_and_no_stick(s: &str) -> IResult<&str, Move> {
     ))
 }
 
-pub fn parse_step_and_water_stick(s: &str) -> IResult<&str, Move> {
+fn parse_step_and_water_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
     let (rest, step) = parse_square(rest)?;
@@ -489,7 +489,7 @@ pub fn parse_step_and_water_stick(s: &str) -> IResult<&str, Move> {
     ))
 }
 
-pub fn parse_step_and_bridge_stick(s: &str) -> IResult<&str, Move> {
+fn parse_step_and_bridge_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
     let (rest, step) = parse_square(rest)?;
@@ -510,7 +510,7 @@ pub fn parse_step_and_bridge_stick(s: &str) -> IResult<&str, Move> {
     ))
 }
 
-pub fn parse_step_and_bridge_stick_and_water_stick(s: &str) -> IResult<&str, Move> {
+fn parse_step_and_bridge_stick_and_water_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
     let (rest, step) = parse_square(rest)?;
@@ -532,7 +532,7 @@ pub fn parse_step_and_bridge_stick_and_water_stick(s: &str) -> IResult<&str, Mov
     ))
 }
 
-pub fn parse_tam_no_step(s: &str) -> IResult<&str, Move> {
+fn parse_tam_no_step(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, _) = char('皇')(rest)?;
     let (rest, vec) = many_m_n(0, 1, parse_tam_sqbracket)(rest)?;
@@ -553,7 +553,7 @@ pub fn parse_tam_no_step(s: &str) -> IResult<&str, Move> {
     ))
 }
 
-pub fn parse_tam_step_unspecified(s: &str) -> IResult<&str, Move> {
+fn parse_tam_step_unspecified(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, _) = char('皇')(rest)?;
     let (rest, step) = parse_square(rest)?;
@@ -568,7 +568,7 @@ pub fn parse_tam_step_unspecified(s: &str) -> IResult<&str, Move> {
     ))
 }
 
-pub fn parse_tam_step_during_former(s: &str) -> IResult<&str, Move> {
+fn parse_tam_step_during_former(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, _) = char('皇')(rest)?;
     let (rest, step) = parse_square(rest)?;
@@ -585,7 +585,7 @@ pub fn parse_tam_step_during_former(s: &str) -> IResult<&str, Move> {
     ))
 }
 
-pub fn parse_tam_step_during_latter(s: &str) -> IResult<&str, Move> {
+fn parse_tam_step_during_latter(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, _) = char('皇')(rest)?;
     let (rest, first_dest) = parse_tam_sqbracket(rest)?;
@@ -602,7 +602,7 @@ pub fn parse_tam_step_during_latter(s: &str) -> IResult<&str, Move> {
     ))
 }
 
-pub fn parse_parachute(s: &str) -> IResult<&str, Move> {
+fn parse_parachute(s: &str) -> IResult<&str, Move> {
     let (rest, color) = one_of("黒赤")(s)?;
     let color = match color {
         '黒' => cetkaik_core::Color::Huok2,
