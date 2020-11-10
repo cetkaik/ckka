@@ -40,6 +40,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "cetkaik_core"
+version = "0.1.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f4746ef194b8397a4fa6a3032a5db7ec64d335df547dd1a2ed1ee58f3a2da1d"
+
+[[package]]
 name = "cfg-if"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -50,6 +56,7 @@ name = "ckka_rust"
 version = "0.1.0"
 dependencies = [
  "big_s",
+ "cetkaik_core",
  "lazy_static",
  "maplit",
  "nom",

@@ -131,7 +131,7 @@ piece-or-wildcard = piece | "片";
 non-vessel-or-wildcard = non-vessel | "片";
 water-stick = "水", ("或" | "或此無" | "無此無" | "一此無" | "二此無" | "三" | "四" | "五");
 bridge-stick = "橋", ("或" | "無" | "一" | "二" | "三" | "四" | "五");
-sqbracket = "[", (square | "或"), "]";
+tam-sqbracket = "[", (square | "或"), "]";
 ```
 
 #### 移動―踏越えなし判定なし
@@ -216,7 +216,7 @@ parachute = ("黒" | "赤"), piece, square;
 #### 移動―皇が駒を踏まずに移動し移動
 
 ```ebnf
-tam-no-step = square, "皇", [ sqbracket ], square;
+tam-no-step = square, "皇", [ tam-sqbracket ], square;
 ```
 
 皇は決して裁を要求しないので、`無撃裁`を書かない。
@@ -230,7 +230,7 @@ tam-no-step = square, "皇", [ sqbracket ], square;
 #### 移動―皇が駒を踏んで移動
 
 ```ebnf
-mid = (sqbracket, square) | (square, [sqbracket]);
+mid = (tam-sqbracket, square) | (square, [tam-sqbracket]);
 tam-step = square, "皇", mid, square;
 ```
 
