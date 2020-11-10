@@ -201,6 +201,7 @@ step-and-bridge-stick-and-water-stick = non-water-square, no-vessel-or-wildcard,
 |     構文     |  意味     |
 |--------------|-----------|
 | `LO弓NOCO橋四水五`   | LOの弓がNOを踏んで、四を出してCOに入水しようとし、五を出し入水判定に成功した。|
+| `LO弓NOCO橋四水一此無`   | LOの弓がNOを踏んで、四を出してCOに入水しようとし、一を出し入水判定に失敗した。|
 
 #### 移動―手駒からの打ち込み
 

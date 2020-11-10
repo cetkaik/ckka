@@ -160,6 +160,246 @@ pub enum Move {
 ///         }
 ///     ))
 /// );
+/// assert_eq!(
+///     parse_movement("XU兵XYXAU無撃裁"),
+///     Ok((
+///         "",
+///         Move::StepAndNoStick {
+///             src: (Row::U, Column::X),
+///             prof: Some(Profession::Kauk2),
+///             step: (Row::Y, Column::X),
+///             dest: (Row::AU, Column::X)
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("NY巫CYCO水五"),
+///     Ok((
+///         "",
+///         Move::StepAndWaterStick {
+///             src: (Row::Y, Column::N),
+///             prof: Some(Profession::Tuk2),
+///             step: (Row::Y, Column::C),
+///             dest: (Row::O, Column::C),
+///             water_stick_size: Some(5),
+///             water_stick_successful: true,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("ME弓MIMU橋四"),
+///     Ok((
+///         "",
+///         Move::StepAndBridgeStick {
+///             src: (Row::E, Column::M),
+///             prof: Some(Profession::Gua2),
+///             step: (Row::I, Column::M),
+///             dest: (Row::U, Column::M),
+///             bridge_stick_size: Some(4),
+///             bridge_stick_successful: true,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("ME弓MIMY橋或"),
+///     Ok((
+///         "",
+///         Move::StepAndBridgeStick {
+///             src: (Row::E, Column::M),
+///             prof: Some(Profession::Gua2),
+///             step: (Row::I, Column::M),
+///             dest: (Row::Y, Column::M),
+///             bridge_stick_size: None,
+///             bridge_stick_successful: true,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("ME弓MIMY橋或此無"),
+///     Ok((
+///         "",
+///         Move::StepAndBridgeStick {
+///             src: (Row::E, Column::M),
+///             prof: Some(Profession::Gua2),
+///             step: (Row::I, Column::M),
+///             dest: (Row::Y, Column::M),
+///             bridge_stick_size: None,
+///             bridge_stick_successful: false,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("ME弓MIMY橋一此無"),
+///     Ok((
+///         "",
+///         Move::StepAndBridgeStick {
+///             src: (Row::E, Column::M),
+///             prof: Some(Profession::Gua2),
+///             step: (Row::I, Column::M),
+///             dest: (Row::Y, Column::M),
+///             bridge_stick_size: Some(1),
+///             bridge_stick_successful: false,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("ME弓MIMY橋無此無"),
+///     Ok((
+///         "",
+///         Move::StepAndBridgeStick {
+///             src: (Row::E, Column::M),
+///             prof: Some(Profession::Gua2),
+///             step: (Row::I, Column::M),
+///             dest: (Row::Y, Column::M),
+///             bridge_stick_size: Some(0),
+///             bridge_stick_successful: false,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("LO弓NOCO橋四水五"),
+///     Ok((
+///         "",
+///         Move::StepAndBridgeStickAndWaterStick {
+///             src: (Row::O, Column::L),
+///             prof: Some(Profession::Gua2),
+///             step: (Row::O, Column::N),
+///             dest: (Row::O, Column::C),
+///             bridge_stick_size: Some(4),
+///             water_stick_size: Some(5),
+///             water_stick_successful: true,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("LO弓NOCO橋四水一此無"),
+///     Ok((
+///         "",
+///         Move::StepAndBridgeStickAndWaterStick {
+///             src: (Row::O, Column::L),
+///             prof: Some(Profession::Gua2),
+///             step: (Row::O, Column::N),
+///             dest: (Row::O, Column::C),
+///             bridge_stick_size: Some(4),
+///             water_stick_size: Some(1),
+///             water_stick_successful: false,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("黒弓MY"),
+///     Ok((
+///         "",
+///         Move::Parachute {
+///             color: cetkaik_core::Color::Huok2,
+///             prof: Profession::Gua2,
+///             dest: (Row::Y, Column::M),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("赤車CI"),
+///     Ok((
+///         "",
+///         Move::Parachute {
+///             color: cetkaik_core::Color::Kok1,
+///             prof: Profession::Kaun1,
+///             dest: (Row::I, Column::C),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("KE皇KI"),
+///     Ok((
+///         "",
+///         Move::TamNoStep {
+///             src: (Row::E, Column::K),
+///             first_dest: None,
+///             second_dest: (Row::I, Column::K),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("KE皇[或]KI"),
+///     Ok((
+///         "",
+///         Move::TamNoStep {
+///             src: (Row::E, Column::K),
+///             first_dest: None,
+///             second_dest: (Row::I, Column::K),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("KE皇[LE]KI"),
+///     Ok((
+///         "",
+///         Move::TamNoStep {
+///             src: (Row::E, Column::K),
+///             first_dest: Some((Row::E, Column::L)),
+///             second_dest: (Row::I, Column::K),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("PAU皇CAIMAU"),
+///     Ok((
+///         "",
+///         Move::TamStepUnspecified {
+///             src: (Row::AU, Column::P),
+///             step: (Row::AI, Column::C),
+///             second_dest: (Row::AU, Column::M),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("PAU皇[MAU]CAIMAU"),
+///     Ok((
+///         "",
+///         Move::TamStepDuringLatter {
+///             src: (Row::AU, Column::P),
+///             first_dest: Some((Row::AU, Column::M)),
+///             step: (Row::AI, Column::C),
+///             second_dest: (Row::AU, Column::M),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("PAU皇[或]CAIMAU"),
+///     Ok((
+///         "",
+///         Move::TamStepDuringLatter {
+///             src: (Row::AU, Column::P),
+///             first_dest: None,
+///             step: (Row::AI, Column::C),
+///             second_dest: (Row::AU, Column::M),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("KE皇LI[KE]KA"),
+///     Ok((
+///         "",
+///         Move::TamStepDuringFormer {
+///             src: (Row::E, Column::K),
+///             step: (Row::I, Column::L),
+///             first_dest: Some((Row::E, Column::K)),
+///             second_dest: (Row::A, Column::K),
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_movement("KE皇LI[或]KA"),
+///     Ok((
+///         "",
+///         Move::TamStepDuringFormer {
+///             src: (Row::E, Column::K),
+///             step: (Row::I, Column::L),
+///             first_dest: None,
+///             second_dest: (Row::A, Column::K),
+///         }
+///     ))
+/// );
 /// ```
 ///
 pub fn parse_movement(s: &str) -> IResult<&str, Move> {
