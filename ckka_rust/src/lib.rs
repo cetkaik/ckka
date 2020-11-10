@@ -2,6 +2,7 @@ use nom::character::complete::*;
 use nom::multi::many_m_n;
 use nom::IResult;
 
+mod header;
 mod pekzep_numeral;
 
 #[macro_use]
@@ -17,6 +18,283 @@ type CKKA = (header::Header, String);
 use nom::branch::alt;
 use nom::combinator::map;
 
+type PossiblyUnknown<T> = Option<T>;
+
+pub enum Move {
+    NoStepAndNoStick {
+        src: absolute::Coord,
+        prof: PossiblyUnknown<cetkaik_core::Profession>,
+        dest: absolute::Coord,
+    },
+
+    NoStepAndWaterStick {
+        src: absolute::Coord,
+        prof: PossiblyUnknown<cetkaik_core::Profession>,
+        dest: absolute::Coord,
+        water_stick_size: PossiblyUnknown<i32>,
+        water_stick_successful: bool,
+    },
+
+    StepAndNoStick {
+        src: absolute::Coord,
+        prof: PossiblyUnknown<cetkaik_core::Profession>,
+        step: absolute::Coord,
+        dest: absolute::Coord,
+    },
+
+    StepAndWaterStick {
+        src: absolute::Coord,
+        prof: PossiblyUnknown<cetkaik_core::Profession>,
+        step: absolute::Coord,
+        dest: absolute::Coord,
+        water_stick_size: PossiblyUnknown<i32>,
+        water_stick_successful: bool,
+    },
+
+    StepAndBridgeStick {
+        src: absolute::Coord,
+        prof: PossiblyUnknown<cetkaik_core::Profession>,
+        step: absolute::Coord,
+        dest: absolute::Coord,
+        bridge_stick_size: PossiblyUnknown<i32>,
+        bridge_stick_successful: bool,
+    },
+
+    StepAndBridgeStickAndWaterStick {
+        src: absolute::Coord,
+        prof: PossiblyUnknown<cetkaik_core::Profession>,
+        step: absolute::Coord,
+        dest: absolute::Coord,
+        bridge_stick_size: PossiblyUnknown<i32>,
+        /* The fact that water_stick_size exists assert that bridge_stick was successful */
+        water_stick_size: PossiblyUnknown<i32>,
+        water_stick_successful: bool,
+    },
+
+    TamNoStep {
+        src: absolute::Coord,
+        first_dest: PossiblyUnknown<absolute::Coord>,
+        second_dest: absolute::Coord,
+    },
+
+    TamStepUnspecified {
+        src: absolute::Coord,
+        step: absolute::Coord,
+        second_dest: absolute::Coord,
+    },
+
+    TamStepDuringFormer {
+        src: absolute::Coord,
+        step: absolute::Coord,
+        first_dest: PossiblyUnknown<absolute::Coord>,
+        second_dest: absolute::Coord,
+    },
+
+    TamStepDuringLatter {
+        src: absolute::Coord,
+        first_dest: PossiblyUnknown<absolute::Coord>,
+        step: absolute::Coord,
+        second_dest: absolute::Coord,
+    },
+
+    Parachute {
+        color: cetkaik_core::Color,
+        prof: cetkaik_core::Profession,
+        dest: absolute::Coord,
+    },
+}
+
+use nom::bytes::complete::tag;
+
+pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, prof) = parse_profession_or_wildcard(rest)?;
+    let (rest, dest) = parse_square(rest)?;
+    let (rest, _) = tag("無撃裁")(rest)?;
+
+    Ok((rest, Move::NoStepAndNoStick { src, prof, dest }))
+}
+pub fn parse_no_step_and_water_stick(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, prof) = parse_profession_or_wildcard(rest)?;
+    let (rest, dest) = parse_square(rest)?;
+    let (rest, (water_stick_size, water_stick_successful)) = parse_water_stick(rest)?;
+
+    Ok((
+        rest,
+        Move::NoStepAndWaterStick {
+            src,
+            prof,
+            dest,
+            water_stick_size,
+            water_stick_successful,
+        },
+    ))
+}
+
+pub fn parse_step_and_no_stick(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, prof) = parse_profession_or_wildcard(rest)?;
+    let (rest, step) = parse_square(rest)?;
+    let (rest, dest) = parse_square(rest)?;
+    let (rest, _) = tag("無撃裁")(rest)?;
+
+    Ok((
+        rest,
+        Move::StepAndNoStick {
+            src,
+            prof,
+            step,
+            dest,
+        },
+    ))
+}
+
+pub fn parse_step_and_water_stick(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, prof) = parse_profession_or_wildcard(rest)?;
+    let (rest, step) = parse_square(rest)?;
+    let (rest, dest) = parse_square(rest)?;
+    let (rest, (water_stick_size, water_stick_successful)) = parse_water_stick(rest)?;
+
+    Ok((
+        rest,
+        Move::StepAndWaterStick {
+            src,
+            prof,
+            step,
+            dest,
+            water_stick_size,
+            water_stick_successful,
+        },
+    ))
+}
+
+pub fn parse_step_and_bridge_stick(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, prof) = parse_profession_or_wildcard(rest)?;
+    let (rest, step) = parse_square(rest)?;
+    let (rest, dest) = parse_square(rest)?;
+    let (rest, bridge_stick_size) = parse_bridge_stick_size(rest)?;
+    let (rest, fail_vec) = many_m_n(0, 1, tag("此無"))(rest)?;
+
+    Ok((
+        rest,
+        Move::StepAndBridgeStick {
+            src,
+            prof,
+            step,
+            dest,
+            bridge_stick_size,
+            bridge_stick_successful: fail_vec.is_empty(),
+        },
+    ))
+}
+
+pub fn parse_step_and_bridge_stick_and_water_stick(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, prof) = parse_profession_or_wildcard(rest)?;
+    let (rest, step) = parse_square(rest)?;
+    let (rest, dest) = parse_square(rest)?;
+    let (rest, bridge_stick_size) = parse_bridge_stick_size(rest)?;
+    let (rest, (water_stick_size, water_stick_successful)) = parse_water_stick(rest)?;
+
+    Ok((
+        rest,
+        Move::StepAndBridgeStickAndWaterStick {
+            src,
+            prof,
+            step,
+            dest,
+            bridge_stick_size,
+            water_stick_size,
+            water_stick_successful,
+        },
+    ))
+}
+
+pub fn parse_tam_no_step(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, _) = char('皇')(rest)?;
+    let (rest, vec) = many_m_n(0, 1, parse_tam_sqbracket)(rest)?;
+    let first_dest: Option<absolute::Coord> = match vec.as_slice() {
+        [] | [None] => None,
+        [Some(a)] => Some(*a),
+        _ => unreachable!(),
+    };
+    let (rest, second_dest) = parse_square(rest)?;
+
+    Ok((
+        rest,
+        Move::TamNoStep {
+            src,
+            first_dest,
+            second_dest,
+        },
+    ))
+}
+
+pub fn parse_tam_step_unspecified(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, _) = char('皇')(rest)?;
+    let (rest, step) = parse_square(rest)?;
+    let (rest, second_dest) = parse_square(rest)?;
+    Ok((
+        rest,
+        Move::TamStepUnspecified {
+            src,
+            step,
+            second_dest,
+        },
+    ))
+}
+
+pub fn parse_tam_step_during_former(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, _) = char('皇')(rest)?;
+    let (rest, step) = parse_square(rest)?;
+    let (rest, first_dest) = parse_tam_sqbracket(rest)?;
+    let (rest, second_dest) = parse_square(rest)?;
+    Ok((
+        rest,
+        Move::TamStepDuringFormer {
+            src,
+            step,
+            first_dest,
+            second_dest,
+        },
+    ))
+}
+
+pub fn parse_tam_step_during_latter(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, _) = char('皇')(rest)?;
+    let (rest, first_dest) = parse_tam_sqbracket(rest)?;
+    let (rest, step) = parse_square(rest)?;
+    let (rest, second_dest) = parse_square(rest)?;
+    Ok((
+        rest,
+        Move::TamStepDuringLatter {
+            src,
+            step,
+            first_dest,
+            second_dest,
+        },
+    ))
+}
+
+pub fn parse_parachute(s: &str) -> IResult<&str, Move> {
+    let (rest, color) = one_of("黒赤")(s)?;
+    let color = match color {
+        '黒' => cetkaik_core::Color::Huok2,
+        '赤' => cetkaik_core::Color::Kok1,
+        _ => unreachable!(),
+    };
+    let (rest, prof) = parse_profession(rest)?;
+    let (rest, dest) = parse_square(rest)?;
+    Ok((rest, Move::Parachute { color, prof, dest }))
+}
+
 /// Examples:
 /// ```
 /// use ckka_rust::parse_tam_sqbracket;
@@ -25,7 +303,7 @@ use nom::combinator::map;
 /// assert_eq!(parse_tam_sqbracket("[或]"), Ok(("", None)))
 /// ```
 ///
-pub fn parse_tam_sqbracket(s: &str) -> IResult<&str, Option<absolute::Coord>> {
+pub fn parse_tam_sqbracket(s: &str) -> IResult<&str, PossiblyUnknown<absolute::Coord>> {
     let (rest, _) = char('[')(s)?;
     let (rest, opt_coord) =
         alt((map(parse_square, |a| Some(a)), map(char('或'), |_| None)))(rest)?;
@@ -58,7 +336,9 @@ pub fn parse_profession(s: &str) -> IResult<&str, cetkaik_core::Profession> {
 /// assert_eq!(parse_profession_or_wildcard("片"), Ok(("", None)))
 /// ```
 ///
-pub fn parse_profession_or_wildcard(s: &str) -> IResult<&str, Option<cetkaik_core::Profession>> {
+pub fn parse_profession_or_wildcard(
+    s: &str,
+) -> IResult<&str, PossiblyUnknown<cetkaik_core::Profession>> {
     use std::str::FromStr;
     let (rest, prof) = one_of("船兵弓車虎馬筆巫将王片")(s)?;
     if prof == '片' {
@@ -69,7 +349,7 @@ pub fn parse_profession_or_wildcard(s: &str) -> IResult<&str, Option<cetkaik_cor
     }
 }
 
-pub fn parse_bridge_stick(s: &str) -> IResult<&str, Option<i32>> {
+pub fn parse_bridge_stick_size(s: &str) -> IResult<&str, PossiblyUnknown<i32>> {
     let (rest, _) = char('橋')(s)?;
     let (rest, size) = one_of("或無一二三四五")(rest)?;
     Ok((
@@ -87,7 +367,7 @@ pub fn parse_bridge_stick(s: &str) -> IResult<&str, Option<i32>> {
     ))
 }
 
-pub fn parse_water_stick(s: &str) -> IResult<&str, (Option<i32>, bool)> {
+pub fn parse_water_stick(s: &str) -> IResult<&str, (PossiblyUnknown<i32>, bool)> {
     let (rest, _) = char('水')(s)?;
     let (rest, vec) = many_m_n(1, 3, one_of("或無一二三四五此"))(rest)?;
 
@@ -151,6 +431,5 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, ()> {
         Err(_) => Err(()),
     }
 }
-mod header;
 #[cfg(test)]
 mod tests;

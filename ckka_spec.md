@@ -115,7 +115,7 @@ pekzep-integer = '無' | [ '下' ], positive;
 
 各々の移動要素とゲーム進行要素はスペースまたは改行によって分断するのが普通であるが、句読点での分断も許される。
 
-移動要素は、以下の `no-step-and-no-stick`, `no-step-and-water-stick`, `step-and-no-stick`, `step-and-water-stick`, `step-and-bridge-stick`, `step-and-bridge-stick-and-water-stick`, `parachute`, `tam-no-step`, `tam-step` のどれか、およびその後に（それぞれの移動に対するコメントとして）`{` と `}` で囲まれた任意の文字列を追加したものである（前述と同様、 `#{` と `}#` などで囲まれていてもよい。）
+移動要素は、以下の `no-step-and-no-stick`, `no-step-and-water-stick`, `step-and-no-stick`, `step-and-water-stick`, `step-and-bridge-stick`, `step-and-bridge-stick-and-water-stick`, `parachute`, `tam-no-step`, `tam-step-unspecified`, `tam-step-during-former`, `tam-step-during-latter` のどれか、およびその後に（それぞれの移動に対するコメントとして）`{` と `}` で囲まれた任意の文字列を追加したものである（前述と同様、 `#{` と `}#` などで囲まれていてもよい。）
 
 持ち駒を打つのでなければ、`兵` などの職業名の代わりに `片` と書くことを許容する。
 
@@ -130,7 +130,7 @@ piece = "船" | non-vessel;
 piece-or-wildcard = piece | "片";
 non-vessel-or-wildcard = non-vessel | "片";
 water-stick = "水", ("或" | "或此無" | "無此無" | "一此無" | "二此無" | "三" | "四" | "五");
-bridge-stick = "橋", ("或" | "無" | "一" | "二" | "三" | "四" | "五");
+bridge-stick-size = "橋", ("或" | "無" | "一" | "二" | "三" | "四" | "五");
 tam-sqbracket = "[", (square | "或"), "]";
 ```
 
@@ -181,7 +181,7 @@ step-and-water-stick = non-water-square, non-vessel-or-wildcard, square, water-s
 #### 移動―踏越えあり無限移動判定あり入水判定なし及び未到達
 
 ```ebnf
-step-and-bridge-stick = square, piece-or-wildcard, square, square, bridge-stick, [ "此無" ];
+step-and-bridge-stick = square, piece-or-wildcard, square, square, bridge-stick-size, [ "此無" ];
 ```
 
 |     構文     |  意味     |
@@ -195,7 +195,7 @@ step-and-bridge-stick = square, piece-or-wildcard, square, square, bridge-stick,
 #### 移動―踏越えあり無限移動判定あり入水判定あり
 
 ```ebnf
-step-and-bridge-stick-and-water-stick = non-water-square, no-vessel-or-wildcard, square, water-square, bridge-stick, water-stick;
+step-and-bridge-stick-and-water-stick = non-water-square, no-vessel-or-wildcard, square, water-square, bridge-stick-size, water-stick;
 ```
 
 |     構文     |  意味     |
@@ -230,8 +230,9 @@ tam-no-step = square, "皇", [ tam-sqbracket ], square;
 #### 移動―皇が駒を踏んで移動
 
 ```ebnf
-mid = (tam-sqbracket, square) | (square, [tam-sqbracket]);
-tam-step = square, "皇", mid, square;
+tam-step-unspecified = square, "皇", square, square;
+tam-step-during-former = square, "皇", square, tam-sqbracket, square;
+tam-step-during-latter = square, "皇", tam-sqbracket, square, square;
 ```
 
 |     構文     |  意味     |
@@ -245,6 +246,8 @@ tam-step = square, "皇", mid, square;
 #### 役と進行
 
 再行は `[SY]為(獣)(同色馬弓兵) 再行` のように書く。終季は `[SY]為(行行)而手五 終季` のように書く。
+
+TODO: 対局者名がかぶったらどうする？
 
 ### 表記法①
 
