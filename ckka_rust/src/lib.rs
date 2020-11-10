@@ -20,6 +20,7 @@ use nom::combinator::map;
 
 type PossiblyUnknown<T> = Option<T>;
 
+#[derive(Eq, PartialEq, Clone, Debug)]
 pub enum Move {
     NoStepAndNoStick {
         src: absolute::Coord,
@@ -106,6 +107,24 @@ pub enum Move {
 
 use nom::bytes::complete::tag;
 
+/// Examples:
+/// ```
+/// use ckka_rust::{parse_no_step_and_no_stick, Move};
+/// use cetkaik_core::Profession;
+/// use cetkaik_core::absolute::*;
+/// assert_eq!(
+///     parse_no_step_and_no_stick("XU兵XY無撃裁"), 
+///     Ok((
+///         "", 
+///         Move::NoStepAndNoStick { 
+///             src: (Row::U, Column::X),
+///             prof: Some(Profession::Kauk2), 
+///             dest: (Row::Y, Column::X),
+///         }
+///     ))
+/// );
+/// ```
+///
 pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
@@ -114,6 +133,66 @@ pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
 
     Ok((rest, Move::NoStepAndNoStick { src, prof, dest }))
 }
+
+/// Examples:
+/// ```
+/// use ckka_rust::*;
+/// use cetkaik_core::Profession;
+/// use cetkaik_core::absolute::*;
+/// assert_eq!(
+///     parse_no_step_and_water_stick("LY弓ZY水或此無"), 
+///     Ok((
+///         "", 
+///         Move::NoStepAndWaterStick { 
+///             src: (Row::Y, Column::L),
+///             prof: Some(Profession::Gua2), 
+///             dest: (Row::Y, Column::Z),
+///             water_stick_size: None,
+///             water_stick_successful: false,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_no_step_and_water_stick("LY弓ZY水一此無"), 
+///     Ok((
+///         "", 
+///         Move::NoStepAndWaterStick { 
+///             src: (Row::Y, Column::L),
+///             prof: Some(Profession::Gua2), 
+///             dest: (Row::Y, Column::Z),
+///             water_stick_size: Some(1),
+///             water_stick_successful: false,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_no_step_and_water_stick("LY弓ZY水五"), 
+///     Ok((
+///         "", 
+///         Move::NoStepAndWaterStick { 
+///             src: (Row::Y, Column::L),
+///             prof: Some(Profession::Gua2), 
+///             dest: (Row::Y, Column::Z),
+///             water_stick_size: Some(5),
+///             water_stick_successful: true,
+///         }
+///     ))
+/// );
+/// assert_eq!(
+///     parse_no_step_and_water_stick("LY弓ZY水或"), 
+///     Ok((
+///         "", 
+///         Move::NoStepAndWaterStick { 
+///             src: (Row::Y, Column::L),
+///             prof: Some(Profession::Gua2), 
+///             dest: (Row::Y, Column::Z),
+///             water_stick_size: None,
+///             water_stick_successful: true,
+///         }
+///     ))
+/// );
+/// ```
+///
 pub fn parse_no_step_and_water_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
