@@ -92,15 +92,13 @@ pub enum Move {
     },
 }
 
-use nom::bytes::complete::tag;
-
 /// Examples:
 /// ```
-/// use ckka_rust::movement::{parse_no_step_and_no_stick, Move};
+/// use ckka_rust::movement::{parse_movement, Move};
 /// use cetkaik_core::Profession;
 /// use cetkaik_core::absolute::*;
 /// assert_eq!(
-///     parse_no_step_and_no_stick("XU兵XY無撃裁"),
+///     parse_movement("XU兵XY無撃裁"),
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndNoStick {
@@ -110,24 +108,8 @@ use nom::bytes::complete::tag;
 ///         }
 ///     ))
 /// );
-/// ```
-///
-pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
-    let (rest, src) = parse_square(s)?;
-    let (rest, prof) = parse_profession_or_wildcard(rest)?;
-    let (rest, dest) = parse_square(rest)?;
-    let (rest, _) = tag("無撃裁")(rest)?;
-
-    Ok((rest, Move::NoStepAndNoStick { src, prof, dest }))
-}
-
-/// Examples:
-/// ```
-/// use ckka_rust::movement::*;
-/// use cetkaik_core::Profession;
-/// use cetkaik_core::absolute::*;
 /// assert_eq!(
-///     parse_no_step_and_water_stick("LY弓ZY水或此無"),
+///     parse_movement("LY弓ZY水或此無"),
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndWaterStick {
@@ -140,7 +122,7 @@ pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
 ///     ))
 /// );
 /// assert_eq!(
-///     parse_no_step_and_water_stick("LY弓ZY水一此無"),
+///     parse_movement("LY弓ZY水一此無"),
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndWaterStick {
@@ -153,7 +135,7 @@ pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
 ///     ))
 /// );
 /// assert_eq!(
-///     parse_no_step_and_water_stick("LY弓ZY水五"),
+///     parse_movement("LY弓ZY水五"),
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndWaterStick {
@@ -166,7 +148,7 @@ pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
 ///     ))
 /// );
 /// assert_eq!(
-///     parse_no_step_and_water_stick("LY弓ZY水或"),
+///     parse_movement("LY弓ZY水或"),
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndWaterStick {
@@ -180,6 +162,35 @@ pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
 /// );
 /// ```
 ///
+pub fn parse_movement(s: &str) -> IResult<&str, Move> {
+    let (rest, movement) = alt((
+        parse_parachute,
+        parse_tam_step_during_former,
+        parse_tam_step_during_latter,
+        parse_tam_step_unspecified,
+        parse_tam_no_step,
+        parse_step_and_bridge_stick_and_water_stick,
+        parse_step_and_bridge_stick,
+        parse_step_and_water_stick,
+        parse_step_and_no_stick,
+        parse_no_step_and_water_stick,
+        parse_no_step_and_no_stick,
+    ))(s)?;
+
+    Ok((rest, movement))
+}
+
+use nom::bytes::complete::tag;
+
+pub fn parse_no_step_and_no_stick(s: &str) -> IResult<&str, Move> {
+    let (rest, src) = parse_square(s)?;
+    let (rest, prof) = parse_profession_or_wildcard(rest)?;
+    let (rest, dest) = parse_square(rest)?;
+    let (rest, _) = tag("無撃裁")(rest)?;
+
+    Ok((rest, Move::NoStepAndNoStick { src, prof, dest }))
+}
+
 pub fn parse_no_step_and_water_stick(s: &str) -> IResult<&str, Move> {
     let (rest, src) = parse_square(s)?;
     let (rest, prof) = parse_profession_or_wildcard(rest)?;
