@@ -11,7 +11,7 @@ type CKKA = (header::Header, String);
 
 pub mod movement;
 
-pub fn parse_ckka(s: &str) -> Result<CKKA, ()> {
+pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
     lazy_static! {
         static ref RE: Regex = Regex::new(r#"^\s*[KLNTZXCMP"]"#).unwrap();
     }
@@ -35,8 +35,8 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, ()> {
 
     match header::header_parser(&header) {
         Ok(("", parsed_head)) => Ok((parsed_head, body)),
-        Ok((a, _)) => panic!("Unparsable fragment `{}` left", a),
-        Err(e) => panic!("Failed to parse header, with error {:?}", e),
+        Ok((a, _)) => Err(format!("Unparsable fragment `{}` left", a)),
+        Err(e) => Err(format!("Failed to parse header, with error `{:?}`", e)),
     }
 }
 #[cfg(test)]
