@@ -22,13 +22,14 @@ use nom::bytes::complete::take_until;
 use nom::character::complete::*;
 use nom::error::*;
 use nom::multi::many0;
+use nom::multi::many1;
 use nom::multi::many_m_n;
 use nom::Err;
 use nom::IResult;
 
 pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
     let (no_used, vec) =
-        many_m_n(1, 1000, one_of("無下一二三四五六七八九十百万億"))(s)?;
+        many1(one_of("無下一二三四五六七八九十百万億"))(s)?;
     match super::pekzep_numeral::analyze(&vec) {
         Some(n) => Ok((no_used, n)),
         None => Err(Err::Error(Error::new(no_used, ErrorKind::Verify))), /* unparsable pekzep numeral */
