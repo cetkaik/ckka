@@ -125,3 +125,6 @@ pub fn header_parser(input: &str) -> IResult<&str, Header> {
 
     Ok((no_used, Header { info, players }))
 }
+
+#[cfg(test)]
+mod tests_;
