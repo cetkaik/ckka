@@ -1,4 +1,3 @@
-use super::header;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::character::complete::{char, one_of};
@@ -119,7 +118,7 @@ pub fn parse_ty_mok_ta_xot(s: &str) -> IResult<&str, (HandCreation, Action)> {
         let (r, _) = tag("終季")(s)?;
         let (r, _) = many1(one_of("\t\r\n \u{00a0}\u{3000}"))(r)?;
         let (r, _) = tag("手")(r)?;
-        let (r, num) = header::parse_pekzep_numeral(r)?;
+        let (r, num) = super::parse_pekzep_numeral(r)?;
         Ok((r, Action::TaXot(num)))
     }))(rest)?;
 
@@ -144,9 +143,9 @@ pub fn parse_ty_mok_ta_xot(s: &str) -> IResult<&str, (HandCreation, Action)> {
 /// );
 /// ```
 pub fn parse_hand_creation(s: &str) -> IResult<&str, HandCreation> {
-    let (rest, player_name) = header::parse_braced_string(s, '[', ']')?;
+    let (rest, player_name) = super::parse_braced_string(s, '[', ']')?;
     let (rest, _) = char('為')(rest)?;
-    let (rest, hands) = many1(|s| header::parse_braced_string(s, '(', ')'))(rest)?;
+    let (rest, hands) = many1(|s| super::parse_braced_string(s, '(', ')'))(rest)?;
 
     Ok((
         rest,

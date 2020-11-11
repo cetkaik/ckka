@@ -20,6 +20,45 @@ use nom::character::complete::one_of;
 use nom::multi::many0;
 use nom::IResult;
 
+use nom::bytes::complete::tag;
+use nom::bytes::complete::take_until;
+use nom::character::complete::char;
+use nom::error::{Error, ErrorKind};
+use nom::multi::many1;
+use nom::Err;
+
+
+pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &str> {
+    let (no_used, vec) = many0(char('#'))(s)?;
+    let (no_used, _) = char(open)(no_used)?;
+
+    // `}####` if vec.len() == 4
+    let end_pattern = format!(
+        "{}{}",
+        close,
+        (0..vec.len()).map(|_| "#").collect::<String>()
+    );
+    let (no_used, in_string) = take_until(&*end_pattern)(no_used)?;
+    let (no_used, _) = tag(&*end_pattern)(no_used)?;
+
+    let (no_used, _) = skip_spaces_and_newlines(no_used)?;
+
+    if in_string.contains('\n') || in_string.contains('\r') {
+        return Err(Err::Error(Error::new(no_used, ErrorKind::Verify)));
+        /* neither key nor value in the header can contain a newline */
+    }
+
+    Ok((no_used, in_string))
+}
+
+pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
+    let (no_used, vec) = many1(one_of("無下一二三四五六七八九十百万億"))(s)?;
+    match pekzep_numeral::analyze(&vec) {
+        Some(n) => Ok((no_used, n)),
+        None => Err(Err::Error(Error::new(no_used, ErrorKind::Verify))), /* unparsable pekzep numeral */
+    }
+}
+
 pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
     lazy_static! {
         static ref RE: Regex = Regex::new(r#"^\s*[KLNTZXCMP"]"#).unwrap();
