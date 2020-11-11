@@ -73,10 +73,7 @@ pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
     }))
 }
 
-fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
-    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(s)?;
-    Ok((no_used, ()))
-}
+use super::skip_spaces_and_newlines;
 
 pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> {
     let (no_used, player_name) = parse_braced_string(s, '[', ']')?;

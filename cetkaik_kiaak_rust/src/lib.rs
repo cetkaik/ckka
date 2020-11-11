@@ -203,11 +203,11 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
         Err(e) => return Err(format!("Failed to parse header, with error `{:?}`", e)),
     };
 
-    let parsed_body = match many0(parse_body_elem)(&body) {
+    let parsed_body = match parse_body(&body) {
         Ok(("", parsed_body)) => parsed_body,
         Ok((a, _)) => {
             return Err(format!(
-                "Unparsable fragment `{}` left while parsing header",
+                "Unparsable fragment `{}` left while parsing body",
                 a
             ))
         }
@@ -215,6 +215,18 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
     };
 
     Ok((parsed_head, Body(parsed_body)))
+}
+
+pub fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
+    let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(s)?;
+    Ok((no_used, ()))
+}
+
+pub fn parse_body(s: &str) -> IResult<&str, Vec<BodyElem>> {
+    let (rest, _) = skip_spaces_and_newlines(s)?;
+    let (rest, vec) = many0(parse_body_elem)(rest)?;
+
+    Ok((rest, vec))
 }
 #[cfg(test)]
 mod tests;
