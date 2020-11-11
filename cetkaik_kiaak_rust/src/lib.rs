@@ -10,7 +10,7 @@ extern crate regex;
 
 use regex::Regex;
 
-use body::{parse_body_elem, Body, Elem};
+use body::{parse_body_elem, Body};
 
 type CKKA = (header::Header, Body);
 
@@ -27,8 +27,7 @@ use nom::error::{Error, ErrorKind};
 use nom::multi::many1;
 use nom::Err;
 
-
-pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &str> {
+fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &str> {
     let (no_used, vec) = many0(char('#'))(s)?;
     let (no_used, _) = char(open)(no_used)?;
 
@@ -57,6 +56,10 @@ pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
         Some(n) => Ok((no_used, n)),
         None => Err(Err::Error(Error::new(no_used, ErrorKind::Verify))), /* unparsable pekzep numeral */
     }
+}
+
+pub fn parse_header(input: &str) -> IResult<&str, header::Header> {
+    header::parse(input)
 }
 
 pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
@@ -103,7 +106,7 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
         Err(e) => return Err(format!("Failed to parse header, with error `{:?}`", e)),
     };
 
-    Ok((parsed_head, Body(parsed_body)))
+    Ok((parsed_head, parsed_body))
 }
 
 fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
@@ -111,11 +114,11 @@ fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
     Ok((no_used, ()))
 }
 
-fn parse_body(s: &str) -> IResult<&str, Vec<Elem>> {
+pub fn parse_body(s: &str) -> IResult<&str, Body> {
     let (rest, _) = skip_spaces_and_newlines(s)?;
     let (rest, vec) = many0(parse_body_elem)(rest)?;
 
-    Ok((rest, vec))
+    Ok((rest, Body(vec)))
 }
 #[cfg(test)]
 mod tests;
