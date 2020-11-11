@@ -1,4 +1,4 @@
-use super::{header, movement};
+use super::header;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::character::complete::{char, one_of};
@@ -6,6 +6,8 @@ use nom::combinator::map;
 use nom::multi::many1;
 use nom::IResult;
 use std::collections::HashSet;
+
+pub mod movement;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Body(pub Vec<Elem>);

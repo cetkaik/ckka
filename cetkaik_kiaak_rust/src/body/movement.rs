@@ -96,7 +96,7 @@ pub enum Move {
 
 /// Examples:
 /// ```
-/// use cetkaik_kiaak::movement::{parse, Move};
+/// use cetkaik_kiaak::body::movement::{parse, Move};
 /// use cetkaik_core::Profession;
 /// use cetkaik_core::absolute::*;
 /// assert_eq!(
@@ -616,7 +616,7 @@ fn parse_parachute(s: &str) -> IResult<&str, Move> {
 
 /// Examples:
 /// ```
-/// use cetkaik_kiaak::movement::parse_tam_sqbracket;
+/// use cetkaik_kiaak::body::movement::parse_tam_sqbracket;
 /// use cetkaik_core::absolute;
 /// assert_eq!(parse_tam_sqbracket("[TY]"), Ok(("", Some((absolute::Row::Y, absolute::Column::T)))));
 /// assert_eq!(parse_tam_sqbracket("[或]"), Ok(("", None)))
@@ -632,7 +632,7 @@ pub fn parse_tam_sqbracket(s: &str) -> IResult<&str, PossiblyUnknown<absolute::C
 
 /// Examples:
 /// ```
-/// use cetkaik_kiaak::movement::parse_profession;
+/// use cetkaik_kiaak::body::movement::parse_profession;
 /// use cetkaik_core::Profession;
 /// assert_eq!(parse_profession("船"), Ok(("", Profession::Nuak1)));
 /// assert_eq!(parse_profession("巫"), Ok(("", Profession::Tuk2)))
@@ -647,7 +647,7 @@ pub fn parse_profession(s: &str) -> IResult<&str, cetkaik_core::Profession> {
 
 /// Examples:
 /// ```
-/// use cetkaik_kiaak::movement::parse_profession_or_wildcard;
+/// use cetkaik_kiaak::body::movement::parse_profession_or_wildcard;
 /// use cetkaik_core::Profession;
 /// assert_eq!(parse_profession_or_wildcard("船"), Ok(("", Some(Profession::Nuak1))));
 /// assert_eq!(parse_profession_or_wildcard("巫"), Ok(("", Some(Profession::Tuk2))));

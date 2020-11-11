@@ -16,8 +16,6 @@ type CKKA = (header::Header, Body);
 
 pub mod body;
 
-pub mod movement;
-
 use nom::character::complete::one_of;
 use nom::multi::many0;
 use nom::IResult;
