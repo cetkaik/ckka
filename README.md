@@ -6,7 +6,7 @@
 
 この仕様書は、「机戦」「セーケ」「パイグ将棋」「セッカイク」などの名で知られている遊戯の棋譜を記述するための標準形式として、CKKA (cet2 kaik kia1 ak1) ファイルの仕様を定めるものである。この仕様は、人間が自然に書くことができ、かつ現状存在する複数の棋譜機構・棋譜データとの互換性をなるべく保つことのできるように定めたものである。
 
-以下、適宜構文をISO/IEC 14977の[EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)で表記する（ISO/IEC 14977は古いし[やめろ](https://dwheeler.com/essays/dont-use-iso-14977-ebnf.html)と主張する記事が出てきたので[W3CのEBNF](https://www.w3.org/TR/xml/#sec-notation)を用いようかとも思ったが、まあISO/IEC 14977でええやろ）。
+以下、適宜構文をISO/IEC 14977の[EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)で表記する（ISO/IEC 14977は古いし[やめろ](https://dwheeler.com/essays/dont-use-iso-14977-ebnf.html)と主張する記事が出てきたので[W3CのEBNF](https://www.w3.org/TR/xml/#sec-notation)を用いようかとも思ったが、まあISO/IEC 14977でええやろ）。`,`は並置を表し、`|`は選択肢を表し、`[ ... ]`は省略可を表す。
 
 ## 文字とエンコード
 CKKAファイルはUTF-8でエンコードされていなければならない。バイトオーダーマークは許容しない。
