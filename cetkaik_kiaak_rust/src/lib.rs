@@ -1,3 +1,6 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::non_ascii_literal)]
+#![allow(clippy::missing_errors_doc)]
 mod header;
 mod pekzep_numeral;
 
@@ -7,7 +10,7 @@ extern crate regex;
 
 use regex::Regex;
 
-use body::*;
+use body::{parse_body_elem, Body, BodyElem};
 
 type CKKA = (header::Header, Body);
 
@@ -15,16 +18,9 @@ pub mod body;
 
 pub mod movement;
 
-use nom::character::complete::*;
+use nom::character::complete::one_of;
 use nom::multi::many0;
-use nom::multi::many1;
 use nom::IResult;
-
-use std::collections::HashSet;
-
-use nom::branch::alt;
-use nom::bytes::complete::tag;
-use nom::combinator::map;
 
 pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
     lazy_static! {
@@ -48,7 +44,7 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
         }
     }
 
-    let parsed_head = match header::header_parser(&header) {
+    let parsed_head = match header::parse(&header) {
         Ok(("", parsed_head)) => parsed_head,
         Ok((a, _)) => {
             return Err(format!(
@@ -73,12 +69,12 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
     Ok((parsed_head, Body(parsed_body)))
 }
 
-pub fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
+fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
     let (no_used, _) = many0(one_of("\t\r\n \u{00a0}\u{3000}"))(s)?;
     Ok((no_used, ()))
 }
 
-pub fn parse_body(s: &str) -> IResult<&str, Vec<BodyElem>> {
+fn parse_body(s: &str) -> IResult<&str, Vec<BodyElem>> {
     let (rest, _) = skip_spaces_and_newlines(s)?;
     let (rest, vec) = many0(parse_body_elem)(rest)?;
 

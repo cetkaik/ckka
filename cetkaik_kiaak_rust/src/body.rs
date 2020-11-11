@@ -1,4 +1,11 @@
-use super::*;
+use super::{header, movement};
+use nom::branch::alt;
+use nom::bytes::complete::tag;
+use nom::character::complete::{char, one_of};
+use nom::combinator::map;
+use nom::multi::many1;
+use nom::IResult;
+use std::collections::HashSet;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Body(pub Vec<BodyElem>);
@@ -16,11 +23,11 @@ use nom::combinator::eof;
 
 pub fn parse_body_elem(s: &str) -> IResult<&str, BodyElem> {
     let (r, body_elem) = alt((
-        map(movement::parse_movement, |m| BodyElem::Move(m)),
+        map(movement::parse, BodyElem::Move),
         map(parse_game_end, |_| BodyElem::GameEnd),
-        map(parse_season_end, |a| BodyElem::SeasonEnd(a)),
+        map(parse_season_end, BodyElem::SeasonEnd),
         map(parse_ty_mok_ta_xot, |(a, b)| BodyElem::TaXotTyMok(a, b)),
-        map(parse_capture_comment, |a| BodyElem::CaptureComment(a)),
+        map(parse_capture_comment, BodyElem::CaptureComment),
     ))(s)?;
     let (no_used, _) = alt((
         map(many1(one_of("\t\r\n \u{00a0}\u{3000}")), |_| ()),
@@ -143,7 +150,10 @@ pub fn parse_hand_creation(s: &str) -> IResult<&str, HandCreation> {
         rest,
         HandCreation {
             player_name: player_name.to_owned(),
-            hands: hands.into_iter().map(|a| a.to_owned()).collect(),
+            hands: hands
+                .into_iter()
+                .map(std::borrow::ToOwned::to_owned)
+                .collect(),
         },
     ))
 }

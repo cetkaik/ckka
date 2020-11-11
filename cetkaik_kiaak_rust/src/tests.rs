@@ -1,7 +1,8 @@
 #[test]
 fn sample1() {
     use super::*;
-    parse_ckka(r#"
+    parse_ckka(
+        r#"
     {https://drive.google.com/drive/folders/183ENcTW65lPGVONnnhkJ1nGKDUYeXWHX?usp=sharing}
     {:2020-10-15}
     [SY]二十 [ぶちょー]二十
@@ -17,5 +18,7 @@ fn sample1() {
     LIA巫NIANAU無撃裁 手王 
     [SY]為(同色獣)(王)終季 手二十
     
-    星一周"#).unwrap();
+    星一周"#,
+    )
+    .unwrap();
 }

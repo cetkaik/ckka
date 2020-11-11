@@ -1,7 +1,7 @@
 #[warn(clippy::pedantic)]
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Header {
-    pub info: Vec<HeaderElem>,
+    pub info: Vec<Elem>,
     pub players: Option<(PlayerAndPoint, PlayerAndPoint)>,
 }
 
@@ -12,15 +12,15 @@ pub struct PlayerAndPoint {
 }
 
 #[derive(Eq, PartialEq, Clone, Debug)]
-pub enum HeaderElem {
+pub enum Elem {
     Value(String),
     KeyedValue(String, String),
 }
 
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_until;
-use nom::character::complete::*;
-use nom::error::*;
+use nom::character::complete::{char, one_of};
+use nom::error::{Error, ErrorKind};
 use nom::multi::many0;
 use nom::multi::many1;
 use nom::multi::many_m_n;
@@ -28,8 +28,7 @@ use nom::Err;
 use nom::IResult;
 
 pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
-    let (no_used, vec) =
-        many1(one_of("無下一二三四五六七八九十百万億"))(s)?;
+    let (no_used, vec) = many1(one_of("無下一二三四五六七八九十百万億"))(s)?;
     match super::pekzep_numeral::analyze(&vec) {
         Some(n) => Ok((no_used, n)),
         None => Err(Err::Error(Error::new(no_used, ErrorKind::Verify))), /* unparsable pekzep numeral */
@@ -59,16 +58,15 @@ pub fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &s
     Ok((no_used, in_string))
 }
 
-pub fn header_elem_parser(s: &str) -> IResult<&str, HeaderElem> {
+pub fn elem_parser(s: &str) -> IResult<&str, Elem> {
     let (no_used, in_string) = parse_braced_string(s, '{', '}')?;
     Ok((no_used, {
         let mut splitter = in_string.splitn(2, ':');
         let first = splitter.next().unwrap();
         let second = splitter.next();
         match (first, second) {
-            ("", Some(val)) => HeaderElem::Value(val.to_owned()),
-            (key, Some(value)) => HeaderElem::KeyedValue(key.to_owned(), value.to_owned()),
-            (val, None) => HeaderElem::Value(val.to_owned()),
+            ("", Some(val)) | (val, None) => Elem::Value(val.to_owned()),
+            (key, Some(value)) => Elem::KeyedValue(key.to_owned(), value.to_owned()),
         }
     }))
 }
@@ -93,9 +91,9 @@ pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> 
     ))
 }
 
-pub fn header_parser(input: &str) -> IResult<&str, Header> {
+pub fn parse(input: &str) -> IResult<&str, Header> {
     let (no_used, _) = skip_spaces_and_newlines(input)?;
-    let (no_used, info) = many0(header_elem_parser)(no_used)?;
+    let (no_used, info) = many0(elem_parser)(no_used)?;
     let (no_used, vec2) = many_m_n(0, 2, player_and_point_parser)(no_used)?;
     let players = match vec2.as_slice() {
         [] => None,
