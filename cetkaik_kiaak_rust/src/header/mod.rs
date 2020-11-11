@@ -23,7 +23,7 @@ use nom::multi::many_m_n;
 use nom::Err;
 use nom::IResult;
 
-pub fn elem_parser(s: &str) -> IResult<&str, Elem> {
+fn elem_parser(s: &str) -> IResult<&str, Elem> {
     let (no_used, in_string) = super::parse_braced_string(s, '{', '}')?;
     Ok((no_used, {
         let mut splitter = in_string.splitn(2, ':');
@@ -38,7 +38,7 @@ pub fn elem_parser(s: &str) -> IResult<&str, Elem> {
 
 use super::skip_spaces_and_newlines;
 
-pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> {
+fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> {
     let (no_used, player_name) = super::parse_braced_string(s, '[', ']')?;
     let (no_used, _) = skip_spaces_and_newlines(no_used)?;
     let (no_used, v) = many_m_n(0, 1, super::parse_pekzep_numeral)(no_used)?;

@@ -1,7 +1,7 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::non_ascii_literal)]
 #![allow(clippy::missing_errors_doc)]
-mod header;
+pub mod header;
 mod pekzep_numeral;
 
 #[macro_use]
