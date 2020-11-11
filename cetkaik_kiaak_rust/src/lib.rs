@@ -10,7 +10,7 @@ extern crate regex;
 
 use regex::Regex;
 
-use body::{parse_body_elem, Body, BodyElem};
+use body::{parse_body_elem, Body, Elem};
 
 type CKKA = (header::Header, Body);
 
@@ -74,7 +74,7 @@ fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
     Ok((no_used, ()))
 }
 
-fn parse_body(s: &str) -> IResult<&str, Vec<BodyElem>> {
+fn parse_body(s: &str) -> IResult<&str, Vec<Elem>> {
     let (rest, _) = skip_spaces_and_newlines(s)?;
     let (rest, vec) = many0(parse_body_elem)(rest)?;
 

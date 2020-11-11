@@ -8,10 +8,10 @@ use nom::IResult;
 use std::collections::HashSet;
 
 #[derive(Eq, PartialEq, Clone, Debug)]
-pub struct Body(pub Vec<BodyElem>);
+pub struct Body(pub Vec<Elem>);
 
 #[derive(Eq, PartialEq, Clone, Debug)]
-pub enum BodyElem {
+pub enum Elem {
     Move(movement::Move),
     CaptureComment(cetkaik_core::Profession),
     TaXotTyMok(HandCreation, Action),
@@ -21,13 +21,13 @@ pub enum BodyElem {
 
 use nom::combinator::eof;
 
-pub fn parse_body_elem(s: &str) -> IResult<&str, BodyElem> {
+pub fn parse_body_elem(s: &str) -> IResult<&str, Elem> {
     let (r, body_elem) = alt((
-        map(movement::parse, BodyElem::Move),
-        map(parse_game_end, |_| BodyElem::GameEnd),
-        map(parse_season_end, BodyElem::SeasonEnd),
-        map(parse_ty_mok_ta_xot, |(a, b)| BodyElem::TaXotTyMok(a, b)),
-        map(parse_capture_comment, BodyElem::CaptureComment),
+        map(movement::parse, Elem::Move),
+        map(parse_game_end, |_| Elem::GameEnd),
+        map(parse_season_end, Elem::SeasonEnd),
+        map(parse_ty_mok_ta_xot, |(a, b)| Elem::TaXotTyMok(a, b)),
+        map(parse_capture_comment, Elem::CaptureComment),
     ))(s)?;
     let (no_used, _) = alt((
         map(many1(one_of("\t\r\n \u{00a0}\u{3000}")), |_| ()),
