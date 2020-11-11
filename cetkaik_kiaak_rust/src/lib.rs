@@ -7,11 +7,41 @@ extern crate regex;
 
 use regex::Regex;
 
-type CKKA = (header::Header, String);
+type CKKA = (header::Header, Body);
+
+#[derive(Eq, PartialEq, Clone, Debug)]
+pub struct Body(Vec<BodyElem>);
+
+#[derive(Eq, PartialEq, Clone, Debug)]
+pub enum BodyElem {
+    Move(movement::Move),
+    CaptureComment(cetkaik_core::Profession),
+    TaXotTyMok(HandCreation, Action),
+    SeasonEnd(Season),
+    GameEnd,
+}
+use nom::combinator::eof;
+
+pub fn parse_body_elem(s: &str) -> IResult<&str, BodyElem> {
+    let (r, body_elem) = alt((
+        map(movement::parse_movement, |m| BodyElem::Move(m)),
+        map(parse_game_end, |_| BodyElem::GameEnd),
+        map(parse_season_end, |a| BodyElem::SeasonEnd(a)),
+        map(parse_ty_mok_ta_xot, |(a, b)| BodyElem::TaXotTyMok(a, b)),
+        map(parse_capture_comment, |a| BodyElem::CaptureComment(a)),
+    ))(s)?;
+    let (no_used, _) = alt((
+        map(many1(one_of("\t\r\n \u{00a0}\u{3000}")), |_| ()),
+        map(eof, |_| ()),
+    ))(r)?;
+
+    Ok((no_used, body_elem))
+}
 
 pub mod movement;
 
 use nom::character::complete::*;
+use nom::multi::many0;
 use nom::multi::many1;
 use nom::IResult;
 
@@ -27,6 +57,7 @@ use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::combinator::map;
 
+#[derive(Eq, PartialEq, Clone, Copy, Debug)]
 pub enum Season {
     Spring,
     Summer,
@@ -161,11 +192,29 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
         }
     }
 
-    match header::header_parser(&header) {
-        Ok(("", parsed_head)) => Ok((parsed_head, body)),
-        Ok((a, _)) => Err(format!("Unparsable fragment `{}` left", a)),
-        Err(e) => Err(format!("Failed to parse header, with error `{:?}`", e)),
-    }
+    let parsed_head = match header::header_parser(&header) {
+        Ok(("", parsed_head)) => parsed_head,
+        Ok((a, _)) => {
+            return Err(format!(
+                "Unparsable fragment `{}` left while parsing header",
+                a
+            ))
+        }
+        Err(e) => return Err(format!("Failed to parse header, with error `{:?}`", e)),
+    };
+
+    let parsed_body = match many0(parse_body_elem)(&body) {
+        Ok(("", parsed_body)) => parsed_body,
+        Ok((a, _)) => {
+            return Err(format!(
+                "Unparsable fragment `{}` left while parsing header",
+                a
+            ))
+        }
+        Err(e) => return Err(format!("Failed to parse header, with error `{:?}`", e)),
+    };
+
+    Ok((parsed_head, Body(parsed_body)))
 }
 #[cfg(test)]
 mod tests;
