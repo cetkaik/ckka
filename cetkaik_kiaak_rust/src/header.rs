@@ -78,7 +78,6 @@ fn skip_spaces_and_newlines(s: &str) -> IResult<&str, ()> {
 }
 
 pub fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> {
-    // TODO implement parsing point
     let (no_used, player_name) = parse_braced_string(s, '[', ']')?;
     let (no_used, _) = skip_spaces_and_newlines(no_used)?;
     let (no_used, v) = many_m_n(0, 1, parse_pekzep_numeral)(no_used)?;
