@@ -83,8 +83,8 @@ elided = '十', [ less-than-ten ]
 less-than-ten-thousand = [ elided ], '百', [ elided ]
     | '百', less-than-hundred
     | less-than-hundred;
-less-than-hundred-million = [ less-than-ten-thousand ], '万', [ less-than-ten-thousand ] | less-than-ten-thousand;
-positive = [ less-than-hundred-million ], '億', [ less-than-hundred-million ] | less-than-hundred-million;
+less-than-hundred-million = [ (less-than-ten-thousand | elided) ], '万', [ (less-than-ten-thousand | elided) ] | less-than-ten-thousand;
+positive = [ (less-than-hundred-million | elided) ], '億', [ (less-than-hundred-million | elided) ] | less-than-hundred-million;
 pekzep-integer = '無' | [ '下' ], positive;
 ```
 

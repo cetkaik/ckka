@@ -56,23 +56,41 @@ fn less_than_100_nun1_elided(s: &[char]) -> Option<i64> {
 fn less_than_10000_0000(input: &[char]) -> Option<i64> {
     match input {
         ['万'] => Some(10000),
-        [head @ .., '万'] => less_than_10000(head).map(|w| w * 10000),
-        ['万', tail @ ..] => Some(10000 + less_than_10000(tail)?),
+        [head @ .., '万'] => less_than_10000_or_elided(head).map(|w| w * 10000),
+        ['万', tail @ ..] => Some(10000 + less_than_10000_or_elided(tail)?),
 
-        [a, '万', tail @ ..] => Some(less_than_10000(&[*a])? * 10000 + less_than_10000(tail)?),
+        [a, '万', tail @ ..] => {
+            Some(less_than_10000_or_elided(&[*a])? * 10000 + less_than_10000_or_elided(tail)?)
+        }
         [a, b, '万', tail @ ..] => {
-            Some(less_than_10000(&[*a, *b])? * 10000 + less_than_10000(tail)?)
+            Some(less_than_10000_or_elided(&[*a, *b])? * 10000 + less_than_10000_or_elided(tail)?)
         }
-        [a, b, c, '万', tail @ ..] => {
-            Some(less_than_10000(&[*a, *b, *c])? * 10000 + less_than_10000(tail)?)
-        }
-        [a, b, c, d, '万', tail @ ..] => {
-            Some(less_than_10000(&[*a, *b, *c, *d])? * 10000 + less_than_10000(tail)?)
-        }
-        [a, b, c, d, e, '万', tail @ ..] => {
-            Some(less_than_10000(&[*a, *b, *c, *d, *e])? * 10000 + less_than_10000(tail)?)
-        }
+        [a, b, c, '万', tail @ ..] => Some(
+            less_than_10000_or_elided(&[*a, *b, *c])? * 10000 + less_than_10000_or_elided(tail)?,
+        ),
+        [a, b, c, d, '万', tail @ ..] => Some(
+            less_than_10000_or_elided(&[*a, *b, *c, *d])? * 10000
+                + less_than_10000_or_elided(tail)?,
+        ),
+        [a, b, c, d, e, '万', tail @ ..] => Some(
+            less_than_10000_or_elided(&[*a, *b, *c, *d, *e])? * 10000
+                + less_than_10000_or_elided(tail)?,
+        ),
         _ => less_than_10000(input),
+    }
+}
+
+pub fn less_than_10000_or_elided(s: &[char]) -> Option<i64> {
+    match less_than_100_nun1_elided(s) {
+        Some(n) => Some(n),
+        None => less_than_10000(s),
+    }
+}
+
+pub fn less_than_10000_0000_or_elided(s: &[char]) -> Option<i64> {
+    match less_than_100_nun1_elided(s) {
+        Some(n) => Some(n),
+        None => less_than_10000_0000(s),
     }
 }
 
@@ -98,18 +116,21 @@ pub fn less_than_10000(s: &[char]) -> Option<i64> {
 fn positive(s: &[char]) -> Option<i64> {
     match s {
         ['億'] => Some(1_0000_0000),
-        [head @ .., '億'] => less_than_10000_0000(head).map(|w| w * 1_0000_0000),
-        ['億', tail @ ..] => Some(1_0000_0000 + less_than_10000_0000(tail)?),
+        [head @ .., '億'] => less_than_10000_0000_or_elided(head).map(|w| w * 1_0000_0000),
+        ['億', tail @ ..] => Some(1_0000_0000 + less_than_10000_0000_or_elided(tail)?),
 
-        [a, '億', tail @ ..] => {
-            Some(less_than_10000_0000(&[*a])? * 1_0000_0000 + less_than_10000_0000(tail)?)
-        }
-        [a, b, '億', tail @ ..] => {
-            Some(less_than_10000_0000(&[*a, *b])? * 1_0000_0000 + less_than_10000_0000(tail)?)
-        }
-        [a, b, c, '億', tail @ ..] => {
-            Some(less_than_10000_0000(&[*a, *b, *c])? * 1_0000_0000 + less_than_10000_0000(tail)?)
-        }
+        [a, '億', tail @ ..] => Some(
+            less_than_10000_0000_or_elided(&[*a])? * 1_0000_0000
+                + less_than_10000_0000_or_elided(tail)?,
+        ),
+        [a, b, '億', tail @ ..] => Some(
+            less_than_10000_0000_or_elided(&[*a, *b])? * 1_0000_0000
+                + less_than_10000_0000_or_elided(tail)?,
+        ),
+        [a, b, c, '億', tail @ ..] => Some(
+            less_than_10000_0000_or_elided(&[*a, *b, *c])? * 1_0000_0000
+                + less_than_10000_0000_or_elided(tail)?,
+        ),
         // only need to handle till 21億
         _ => less_than_10000_0000(s),
     }
