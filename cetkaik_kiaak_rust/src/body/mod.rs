@@ -111,6 +111,16 @@ pub fn parse_capture_comment(s: &str) -> IResult<&str, cetkaik_core::Profession>
 ///         }, Action::TaXot(10))
 ///     ))
 /// );
+/// assert_eq!(
+///     parse_ty_mok_ta_xot("[SY]為(獣)(同色馬弓兵)終季 手20"),
+///     Ok((
+///         "",
+///         (HandCreation {
+///             player_name: String::from("SY"),
+///             hands: HashSet::from_iter(vec![String::from("獣"), String::from("同色馬弓兵")].into_iter())
+///         }, Action::TaXot(20))
+///     ))
+/// );
 /// ```
 pub fn parse_ty_mok_ta_xot(s: &str) -> IResult<&str, (HandCreation, Action)> {
     let (rest, hand_creation) = parse_hand_creation(s)?;
@@ -118,7 +128,7 @@ pub fn parse_ty_mok_ta_xot(s: &str) -> IResult<&str, (HandCreation, Action)> {
         let (r, _) = tag("終季")(s)?;
         let (r, _) = many1(one_of("\t\r\n \u{00a0}\u{3000}"))(r)?;
         let (r, _) = tag("手")(r)?;
-        let (r, num) = super::parse_pekzep_numeral(r)?;
+        let (r, num) = super::parse_numeral(r)?;
         Ok((r, Action::TaXot(num)))
     }))(rest)?;
 

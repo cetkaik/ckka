@@ -16,10 +16,12 @@ type CKKA = (header::Header, Body);
 
 pub mod body;
 
+use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_until;
 use nom::character::complete::char;
 use nom::character::complete::one_of;
+use nom::combinator::opt;
 use nom::error::{Error, ErrorKind};
 use nom::multi::many0;
 use nom::multi::many1;
@@ -47,6 +49,20 @@ fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &str> 
     }
 
     Ok((no_used, in_string))
+}
+
+pub fn parse_numeral(s: &str) -> IResult<&str, i64> {
+    alt((parse_arabic_numeral, parse_pekzep_numeral))(s)
+}
+
+pub fn parse_arabic_numeral(s: &str) -> IResult<&str, i64> {
+    let (rest, neg) = opt(char('-'))(s)?;
+    let (rest, num_vec) = many1(one_of("0123456789"))(rest)?;
+    let acc = i64::from_str_radix(&num_vec.into_iter().collect::<String>(), 10);
+    match acc {
+        Ok(num) => Ok((rest, if neg.is_some() { -num } else { num })),
+        Err(_) => Err(Err::Error(Error::new(rest, ErrorKind::Verify))), /* unparsable arabic numeral */
+    }
 }
 
 pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {

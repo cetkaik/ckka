@@ -42,7 +42,7 @@ use super::skip_spaces_and_newlines;
 fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> {
     let (no_used, player_name) = super::parse_braced_string(s, '[', ']')?;
     let (no_used, _) = skip_spaces_and_newlines(no_used)?;
-    let (no_used, opt_num) = opt(super::parse_pekzep_numeral)(no_used)?;
+    let (no_used, opt_num) = opt(super::parse_numeral)(no_used)?;
     let (no_used, _) = skip_spaces_and_newlines(no_used)?;
     Ok((no_used, (player_name.to_owned(), opt_num)))
 }

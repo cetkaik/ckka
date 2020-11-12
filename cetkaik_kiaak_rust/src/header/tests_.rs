@@ -59,6 +59,33 @@ fn it_works3() {
     )
 }
 
+
+#[test]
+fn it_works4() {
+    assert_eq!(
+        parse(
+            r#"{:2018年4月8日 01:30頃}
+[JV]21 [SY]"#
+        ),
+        Ok((
+            "",
+            Header {
+                info: vec![Elem::Value(S("2018年4月8日 01:30頃"))],
+                players: Some((
+                    PlayerAndPoint {
+                        player_name: S("JV"),
+                        point: 21
+                    },
+                    PlayerAndPoint {
+                        player_name: S("SY"),
+                        point: 19
+                    },
+                ))
+            }
+        ))
+    )
+}
+
 #[test]
 fn it_works2() {
     assert_eq!(
