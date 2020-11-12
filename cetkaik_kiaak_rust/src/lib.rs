@@ -16,16 +16,15 @@ type CKKA = (header::Header, Body);
 
 pub mod body;
 
-use nom::character::complete::one_of;
-use nom::multi::many0;
-use nom::IResult;
-
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_until;
 use nom::character::complete::char;
+use nom::character::complete::one_of;
 use nom::error::{Error, ErrorKind};
+use nom::multi::many0;
 use nom::multi::many1;
 use nom::Err;
+use nom::IResult;
 
 fn parse_braced_string(s: &str, open: char, close: char) -> IResult<&str, &str> {
     let (no_used, vec) = many0(char('#'))(s)?;
