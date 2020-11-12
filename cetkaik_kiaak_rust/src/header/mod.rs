@@ -17,6 +17,7 @@ pub enum Elem {
     KeyedValue(String, String),
 }
 
+use nom::combinator::opt;
 use nom::error::{Error, ErrorKind};
 use nom::multi::many0;
 use nom::multi::many_m_n;
@@ -41,19 +42,9 @@ use super::skip_spaces_and_newlines;
 fn player_and_point_parser(s: &str) -> IResult<&str, (String, Option<i64>)> {
     let (no_used, player_name) = super::parse_braced_string(s, '[', ']')?;
     let (no_used, _) = skip_spaces_and_newlines(no_used)?;
-    let (no_used, v) = many_m_n(0, 1, super::parse_pekzep_numeral)(no_used)?;
+    let (no_used, opt_num) = opt(super::parse_pekzep_numeral)(no_used)?;
     let (no_used, _) = skip_spaces_and_newlines(no_used)?;
-    Ok((
-        no_used,
-        (
-            player_name.to_owned(),
-            match v.as_slice() {
-                [] => None,
-                [num] => Some(*num),
-                _ => unreachable!(),
-            },
-        ),
-    ))
+    Ok((no_used, (player_name.to_owned(), opt_num)))
 }
 
 pub fn parse(input: &str) -> IResult<&str, Header> {

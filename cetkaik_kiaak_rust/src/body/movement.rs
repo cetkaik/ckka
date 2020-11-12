@@ -2,6 +2,7 @@ use cetkaik_core::absolute;
 use nom::branch::alt;
 use nom::character::complete::{char, one_of};
 use nom::combinator::map;
+use nom::combinator::opt;
 use nom::error::{Error, ErrorKind};
 use nom::multi::many_m_n;
 use nom::Err;
@@ -495,7 +496,7 @@ fn parse_step_and_bridge_stick(s: &str) -> IResult<&str, Move> {
     let (rem, step) = parse_square(rem)?;
     let (rem, dest) = parse_square(rem)?;
     let (rem, bridge_stick_size) = parse_bridge_stick_size(rem)?;
-    let (rem, fail_vec) = many_m_n(0, 1, tag("此無"))(rem)?;
+    let (rem, fail) = opt(tag("此無"))(rem)?;
 
     Ok((
         rem,
@@ -505,7 +506,7 @@ fn parse_step_and_bridge_stick(s: &str) -> IResult<&str, Move> {
             step,
             dest,
             bridge_stick_size,
-            bridge_stick_successful: fail_vec.is_empty(),
+            bridge_stick_successful: fail.is_none(),
         },
     ))
 }
@@ -535,11 +536,10 @@ fn parse_step_and_bridge_stick_and_water_stick(s: &str) -> IResult<&str, Move> {
 fn parse_tam_no_step(s: &str) -> IResult<&str, Move> {
     let (rem, src) = parse_square(s)?;
     let (rem, _) = char('皇')(rem)?;
-    let (rem, vec) = many_m_n(0, 1, parse_tam_sqbracket)(rem)?;
-    let first_dest: Option<absolute::Coord> = match vec.as_slice() {
-        [] | [None] => None,
-        [Some(a)] => Some(*a),
-        _ => unreachable!(),
+    let (rem, tamsq) = opt(parse_tam_sqbracket)(rem)?;
+    let first_dest: Option<absolute::Coord> = match tamsq {
+        None | Some(None) => None,
+        Some(Some(a)) => Some(a),
     };
     let (rem, second_dest) = parse_square(rem)?;
 
