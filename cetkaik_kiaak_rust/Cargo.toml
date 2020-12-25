@@ -12,6 +12,6 @@ license = "MIT"
 big_s = "1.0.2"
 lazy_static = "1.4.0"
 maplit = "1.0.2"
-nom = {version = "6.0.0", features = ["alloc"]}
+nom = {version = "6.0.1", features = ["alloc"]}
 regex = "1.4.2"
-cetkaik_core = "0.1.11"
+cetkaik_core = "0.2.2"
