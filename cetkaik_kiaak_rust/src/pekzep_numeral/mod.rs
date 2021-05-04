@@ -53,6 +53,7 @@ fn less_than_100_nun1_elided(s: &[char]) -> Option<i64> {
     }
 }
 
+#[allow(clippy::many_single_char_names)]
 fn less_than_10000_0000(input: &[char]) -> Option<i64> {
     match input {
         ['万'] => Some(10000),

@@ -1,6 +1,7 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::non_ascii_literal)]
 #![allow(clippy::missing_errors_doc)]
+#![allow(clippy::upper_case_acronyms)]
 pub mod header;
 mod pekzep_numeral;
 

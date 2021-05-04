@@ -13,5 +13,5 @@ big_s = "1.0.2"
 lazy_static = "1.4.0"
 maplit = "1.0.2"
 nom = {version = "6.1.2", features = ["alloc"]}
-regex = "1.4.3"
-cetkaik_core = "0.3.4"
+regex = "1.5.3"
+cetkaik_core = "0.3.8"
