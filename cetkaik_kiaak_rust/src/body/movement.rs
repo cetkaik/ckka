@@ -105,9 +105,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndNoStick {
-///             src: (Row::U, Column::X),
+///             src: Coord(Row::U, Column::X),
 ///             prof: Some(Profession::Kauk2),
-///             dest: (Row::Y, Column::X),
+///             dest: Coord(Row::Y, Column::X),
 ///         }
 ///     ))
 /// );
@@ -116,9 +116,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndWaterStick {
-///             src: (Row::Y, Column::L),
+///             src: Coord(Row::Y, Column::L),
 ///             prof: Some(Profession::Gua2),
-///             dest: (Row::Y, Column::Z),
+///             dest: Coord(Row::Y, Column::Z),
 ///             water_stick_size: None,
 ///             water_stick_successful: false,
 ///         }
@@ -129,9 +129,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndWaterStick {
-///             src: (Row::Y, Column::L),
+///             src: Coord(Row::Y, Column::L),
 ///             prof: Some(Profession::Gua2),
-///             dest: (Row::Y, Column::Z),
+///             dest: Coord(Row::Y, Column::Z),
 ///             water_stick_size: Some(1),
 ///             water_stick_successful: false,
 ///         }
@@ -142,9 +142,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndWaterStick {
-///             src: (Row::Y, Column::L),
+///             src: Coord(Row::Y, Column::L),
 ///             prof: Some(Profession::Gua2),
-///             dest: (Row::Y, Column::Z),
+///             dest: Coord(Row::Y, Column::Z),
 ///             water_stick_size: Some(5),
 ///             water_stick_successful: true,
 ///         }
@@ -155,9 +155,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::NoStepAndWaterStick {
-///             src: (Row::Y, Column::L),
+///             src: Coord(Row::Y, Column::L),
 ///             prof: Some(Profession::Gua2),
-///             dest: (Row::Y, Column::Z),
+///             dest: Coord(Row::Y, Column::Z),
 ///             water_stick_size: None,
 ///             water_stick_successful: true,
 ///         }
@@ -168,10 +168,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndNoStick {
-///             src: (Row::U, Column::X),
+///             src: Coord(Row::U, Column::X),
 ///             prof: Some(Profession::Kauk2),
-///             step: (Row::Y, Column::X),
-///             dest: (Row::AU, Column::X)
+///             step: Coord(Row::Y, Column::X),
+///             dest: Coord(Row::AU, Column::X)
 ///         }
 ///     ))
 /// );
@@ -180,10 +180,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndWaterStick {
-///             src: (Row::Y, Column::N),
+///             src: Coord(Row::Y, Column::N),
 ///             prof: Some(Profession::Tuk2),
-///             step: (Row::Y, Column::C),
-///             dest: (Row::O, Column::C),
+///             step: Coord(Row::Y, Column::C),
+///             dest: Coord(Row::O, Column::C),
 ///             water_stick_size: Some(5),
 ///             water_stick_successful: true,
 ///         }
@@ -194,10 +194,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndBridgeStick {
-///             src: (Row::E, Column::M),
+///             src: Coord(Row::E, Column::M),
 ///             prof: Some(Profession::Gua2),
-///             step: (Row::I, Column::M),
-///             dest: (Row::U, Column::M),
+///             step: Coord(Row::I, Column::M),
+///             dest: Coord(Row::U, Column::M),
 ///             bridge_stick_size: Some(4),
 ///             bridge_stick_successful: true,
 ///         }
@@ -208,10 +208,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndBridgeStick {
-///             src: (Row::E, Column::M),
+///             src: Coord(Row::E, Column::M),
 ///             prof: Some(Profession::Gua2),
-///             step: (Row::I, Column::M),
-///             dest: (Row::Y, Column::M),
+///             step: Coord(Row::I, Column::M),
+///             dest: Coord(Row::Y, Column::M),
 ///             bridge_stick_size: None,
 ///             bridge_stick_successful: true,
 ///         }
@@ -222,10 +222,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndBridgeStick {
-///             src: (Row::E, Column::M),
+///             src: Coord(Row::E, Column::M),
 ///             prof: Some(Profession::Gua2),
-///             step: (Row::I, Column::M),
-///             dest: (Row::Y, Column::M),
+///             step: Coord(Row::I, Column::M),
+///             dest: Coord(Row::Y, Column::M),
 ///             bridge_stick_size: None,
 ///             bridge_stick_successful: false,
 ///         }
@@ -236,10 +236,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndBridgeStick {
-///             src: (Row::E, Column::M),
+///             src: Coord(Row::E, Column::M),
 ///             prof: Some(Profession::Gua2),
-///             step: (Row::I, Column::M),
-///             dest: (Row::Y, Column::M),
+///             step: Coord(Row::I, Column::M),
+///             dest: Coord(Row::Y, Column::M),
 ///             bridge_stick_size: Some(1),
 ///             bridge_stick_successful: false,
 ///         }
@@ -250,10 +250,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndBridgeStick {
-///             src: (Row::E, Column::M),
+///             src: Coord(Row::E, Column::M),
 ///             prof: Some(Profession::Gua2),
-///             step: (Row::I, Column::M),
-///             dest: (Row::Y, Column::M),
+///             step: Coord(Row::I, Column::M),
+///             dest: Coord(Row::Y, Column::M),
 ///             bridge_stick_size: Some(0),
 ///             bridge_stick_successful: false,
 ///         }
@@ -264,10 +264,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndBridgeStickAndWaterStick {
-///             src: (Row::O, Column::L),
+///             src: Coord(Row::O, Column::L),
 ///             prof: Some(Profession::Gua2),
-///             step: (Row::O, Column::N),
-///             dest: (Row::O, Column::C),
+///             step: Coord(Row::O, Column::N),
+///             dest: Coord(Row::O, Column::C),
 ///             bridge_stick_size: Some(4),
 ///             water_stick_size: Some(5),
 ///             water_stick_successful: true,
@@ -279,10 +279,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::StepAndBridgeStickAndWaterStick {
-///             src: (Row::O, Column::L),
+///             src: Coord(Row::O, Column::L),
 ///             prof: Some(Profession::Gua2),
-///             step: (Row::O, Column::N),
-///             dest: (Row::O, Column::C),
+///             step: Coord(Row::O, Column::N),
+///             dest: Coord(Row::O, Column::C),
 ///             bridge_stick_size: Some(4),
 ///             water_stick_size: Some(1),
 ///             water_stick_successful: false,
@@ -296,7 +296,7 @@ pub enum Move {
 ///         Move::Parachute {
 ///             color: cetkaik_core::Color::Huok2,
 ///             prof: Profession::Gua2,
-///             dest: (Row::Y, Column::M),
+///             dest: Coord(Row::Y, Column::M),
 ///         }
 ///     ))
 /// );
@@ -307,7 +307,7 @@ pub enum Move {
 ///         Move::Parachute {
 ///             color: cetkaik_core::Color::Kok1,
 ///             prof: Profession::Kaun1,
-///             dest: (Row::I, Column::C),
+///             dest: Coord(Row::I, Column::C),
 ///         }
 ///     ))
 /// );
@@ -316,9 +316,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::TamNoStep {
-///             src: (Row::E, Column::K),
+///             src: Coord(Row::E, Column::K),
 ///             first_dest: None,
-///             second_dest: (Row::I, Column::K),
+///             second_dest: Coord(Row::I, Column::K),
 ///         }
 ///     ))
 /// );
@@ -327,9 +327,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::TamNoStep {
-///             src: (Row::E, Column::K),
+///             src: Coord(Row::E, Column::K),
 ///             first_dest: None,
-///             second_dest: (Row::I, Column::K),
+///             second_dest: Coord(Row::I, Column::K),
 ///         }
 ///     ))
 /// );
@@ -338,9 +338,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::TamNoStep {
-///             src: (Row::E, Column::K),
-///             first_dest: Some((Row::E, Column::L)),
-///             second_dest: (Row::I, Column::K),
+///             src: Coord(Row::E, Column::K),
+///             first_dest: Some(Coord(Row::E, Column::L)),
+///             second_dest: Coord(Row::I, Column::K),
 ///         }
 ///     ))
 /// );
@@ -349,9 +349,9 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::TamStepUnspecified {
-///             src: (Row::AU, Column::P),
-///             step: (Row::AI, Column::C),
-///             second_dest: (Row::AU, Column::M),
+///             src: Coord(Row::AU, Column::P),
+///             step: Coord(Row::AI, Column::C),
+///             second_dest: Coord(Row::AU, Column::M),
 ///         }
 ///     ))
 /// );
@@ -360,10 +360,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::TamStepDuringLatter {
-///             src: (Row::AU, Column::P),
-///             first_dest: Some((Row::AU, Column::M)),
-///             step: (Row::AI, Column::C),
-///             second_dest: (Row::AU, Column::M),
+///             src: Coord(Row::AU, Column::P),
+///             first_dest: Some(Coord(Row::AU, Column::M)),
+///             step: Coord(Row::AI, Column::C),
+///             second_dest: Coord(Row::AU, Column::M),
 ///         }
 ///     ))
 /// );
@@ -372,10 +372,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::TamStepDuringLatter {
-///             src: (Row::AU, Column::P),
+///             src: Coord(Row::AU, Column::P),
 ///             first_dest: None,
-///             step: (Row::AI, Column::C),
-///             second_dest: (Row::AU, Column::M),
+///             step: Coord(Row::AI, Column::C),
+///             second_dest: Coord(Row::AU, Column::M),
 ///         }
 ///     ))
 /// );
@@ -384,10 +384,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::TamStepDuringFormer {
-///             src: (Row::E, Column::K),
-///             step: (Row::I, Column::L),
-///             first_dest: Some((Row::E, Column::K)),
-///             second_dest: (Row::A, Column::K),
+///             src: Coord(Row::E, Column::K),
+///             step: Coord(Row::I, Column::L),
+///             first_dest: Some(Coord(Row::E, Column::K)),
+///             second_dest: Coord(Row::A, Column::K),
 ///         }
 ///     ))
 /// );
@@ -396,10 +396,10 @@ pub enum Move {
 ///     Ok((
 ///         "",
 ///         Move::TamStepDuringFormer {
-///             src: (Row::E, Column::K),
-///             step: (Row::I, Column::L),
+///             src: Coord(Row::E, Column::K),
+///             step: Coord(Row::I, Column::L),
 ///             first_dest: None,
-///             second_dest: (Row::A, Column::K),
+///             second_dest: Coord(Row::A, Column::K),
 ///         }
 ///     ))
 /// );
@@ -618,7 +618,7 @@ fn parse_parachute(s: &str) -> IResult<&str, Move> {
 /// ```
 /// use cetkaik_kiaak::body::movement::parse_tam_sqbracket;
 /// use cetkaik_core::absolute;
-/// assert_eq!(parse_tam_sqbracket("[TY]"), Ok(("", Some((absolute::Row::Y, absolute::Column::T)))));
+/// assert_eq!(parse_tam_sqbracket("[TY]"), Ok(("", Some(absolute::Coord(absolute::Row::Y, absolute::Column::T)))));
 /// assert_eq!(parse_tam_sqbracket("[或]"), Ok(("", None)))
 /// ```
 ///
