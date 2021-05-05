@@ -630,6 +630,24 @@ pub fn parse_tam_sqbracket(s: &str) -> IResult<&str, PossiblyUnknown<absolute::C
     Ok((rem, opt_coord))
 }
 
+use std::collections::HashMap;
+fn one_of_and_map<'a, U, Error: nom::error::ParseError<&'a str>>(
+    list: HashMap<char, U>,
+) -> impl Fn(&'a str) -> IResult<&str, U, Error>
+where
+    U: Copy,
+{
+    use nom::AsChar;
+    use nom::InputIter;
+    use nom::Slice;
+    move |i: &str| match (i).iter_elements().next().map(|c| (c, list.get(&c))) {
+        Some((c, Some(u))) => Ok((i.slice(c.len()..), *u)),
+        _ => Err(Err::Error(Error::from_error_kind(i, ErrorKind::OneOf))),
+    }
+}
+
+use maplit::hashmap;
+
 /// Examples:
 /// ```
 /// use cetkaik_kiaak::body::movement::parse_profession;
@@ -639,10 +657,19 @@ pub fn parse_tam_sqbracket(s: &str) -> IResult<&str, PossiblyUnknown<absolute::C
 /// ```
 ///
 pub fn parse_profession(s: &str) -> IResult<&str, cetkaik_core::Profession> {
-    use std::str::FromStr;
-    let (rem, prof) = one_of("船兵弓車虎馬筆巫将王")(s)?;
-    let prof = cetkaik_core::Profession::from_str(&prof.to_string()).unwrap();
-    Ok((rem, prof))
+    use cetkaik_core::Profession;
+    one_of_and_map(hashmap![
+        '船' => Profession::Nuak1,
+        '兵' => Profession::Kauk2,
+        '弓' => Profession::Gua2,
+        '車' => Profession::Kaun1,
+        '虎' => Profession::Dau2,
+        '馬' => Profession::Maun1,
+        '筆' => Profession::Kua2,
+        '巫' => Profession::Tuk2,
+        '将' => Profession::Uai1,
+        '王' => Profession::Io,
+    ])(s)
 }
 
 /// Examples:
@@ -657,32 +684,33 @@ pub fn parse_profession(s: &str) -> IResult<&str, cetkaik_core::Profession> {
 pub fn parse_profession_or_wildcard(
     s: &str,
 ) -> IResult<&str, PossiblyUnknown<cetkaik_core::Profession>> {
-    use std::str::FromStr;
-    let (rem, prof) = one_of("船兵弓車虎馬筆巫将王片")(s)?;
-    if prof == '片' {
-        Ok((rem, None))
-    } else {
-        let prof = cetkaik_core::Profession::from_str(&prof.to_string()).unwrap();
-        Ok((rem, Some(prof)))
-    }
+    use cetkaik_core::Profession;
+    one_of_and_map(hashmap! {
+        '船' => Some(Profession::Nuak1),
+        '兵' => Some(Profession::Kauk2),
+        '弓' => Some(Profession::Gua2),
+        '車' => Some(Profession::Kaun1),
+        '虎' => Some(Profession::Dau2),
+        '馬' => Some(Profession::Maun1),
+        '筆' => Some(Profession::Kua2),
+        '巫' => Some(Profession::Tuk2),
+        '将' => Some(Profession::Uai1),
+        '王' => Some(Profession::Io),
+        '片' => None
+    })(s)
 }
 
 pub fn parse_bridge_stick_size(s: &str) -> IResult<&str, PossiblyUnknown<i32>> {
     let (rem, _) = char('橋')(s)?;
-    let (rem, size) = one_of("或無一二三四五")(rem)?;
-    Ok((
-        rem,
-        match size {
-            '或' => None,
-            '無' => Some(0),
-            '一' => Some(1),
-            '二' => Some(2),
-            '三' => Some(3),
-            '四' => Some(4),
-            '五' => Some(5),
-            _ => unreachable!(),
-        },
-    ))
+    one_of_and_map(hashmap! {
+        '或' => None,
+        '無' => Some(0),
+        '一' => Some(1),
+        '二' => Some(2),
+        '三' => Some(3),
+        '四' => Some(4),
+        '五' => Some(5),
+    })(rem)
 }
 
 pub fn parse_water_stick(s: &str) -> IResult<&str, (PossiblyUnknown<i32>, bool)> {
@@ -711,13 +739,12 @@ pub fn parse_water_stick(s: &str) -> IResult<&str, (PossiblyUnknown<i32>, bool)>
 pub fn parse_square(s: &str) -> IResult<&str, absolute::Coord> {
     let (rem, column) = one_of("KLNTZXCMP")(s)?;
     let (rem, row) = many_m_n(1, 2, one_of("AEIOUY"))(rem)?;
-    Ok((
-        rem,
-        absolute::parse_coord(&format!(
-            "{}{}",
-            column,
-            row.into_iter().collect::<String>()
-        ))
-        .unwrap(),
+
+    let coord = absolute::parse_coord(&format!(
+        "{}{}",
+        column,
+        row.into_iter().collect::<String>()
     ))
+    .ok_or_else(|| Err::Error(Error::new(rem, ErrorKind::Verify)))?;
+    Ok((rem, coord))
 }
