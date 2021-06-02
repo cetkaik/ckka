@@ -3,7 +3,8 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::upper_case_acronyms)]
 pub mod header;
-mod pekzep_numeral;
+
+extern crate pekzep_numeral;
 
 #[macro_use]
 extern crate lazy_static;

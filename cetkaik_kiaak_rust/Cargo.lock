@@ -51,13 +51,14 @@ dependencies = [
 
 [[package]]
 name = "cetkaik_kiaak"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "big_s",
  "cetkaik_core",
  "lazy_static",
  "maplit",
  "nom",
+ "pekzep_numeral",
  "regex",
 ]
 
@@ -116,6 +117,12 @@ dependencies = [
  "memchr",
  "version_check",
 ]
+
+[[package]]
+name = "pekzep_numeral"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05c5a49703baacb0f427f30eb318c2432215adec2eceaa8e831b426c8be67239"
 
 [[package]]
 name = "proc-macro2"
