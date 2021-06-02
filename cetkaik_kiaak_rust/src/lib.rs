@@ -69,7 +69,7 @@ pub fn parse_arabic_numeral(s: &str) -> IResult<&str, i64> {
 
 pub fn parse_pekzep_numeral(s: &str) -> IResult<&str, i64> {
     let (no_used, vec) = many1(one_of("無下一二三四五六七八九十百万億"))(s)?;
-    match pekzep_numeral::analyze(&vec) {
+    match pekzep_numeral::chars_to_num(&vec) {
         Some(n) => Ok((no_used, n)),
         None => Err(Err::Error(Error::new(no_used, ErrorKind::Verify))), /* unparsable pekzep numeral */
     }

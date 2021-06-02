@@ -15,4 +15,4 @@ maplit = "1.0.2"
 nom = {version = "6.1.2", features = ["alloc"]}
 regex = "1.5.3"
 cetkaik_core = "0.3.8"
-pekzep_numeral = "0.1.0"
+pekzep_numeral = "0.2.0"
