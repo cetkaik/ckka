@@ -6,7 +6,7 @@ fn header_elem() {
     assert_eq!(
         elem_parser("{律:硬皇力}"),
         Ok(("", Elem::KeyedValue(S("律"), S("硬皇力"))))
-    )
+    );
 }
 
 #[test]
@@ -14,7 +14,7 @@ fn header_elem_2() {
     assert_eq!(
         elem_parser("{硬皇力}"),
         Ok(("", Elem::Value(S("硬皇力"))))
-    )
+    );
 }
 
 #[test]
@@ -22,7 +22,7 @@ fn header_elem_3() {
     assert_eq!(
         elem_parser("#{硬皇力}#"),
         Ok(("", Elem::Value(S("硬皇力"))))
-    )
+    );
 }
 
 #[test]
@@ -30,7 +30,7 @@ fn header_elem_4() {
     assert_eq!(
         elem_parser("#{硬皇}力}#"),
         Ok(("", Elem::Value(S("硬皇}力"))))
-    )
+    );
 }
 
 #[test]
@@ -56,7 +56,7 @@ fn it_works3() {
                 ))
             }
         ))
-    )
+    );
 }
 
 
@@ -83,7 +83,7 @@ fn it_works4() {
                 ))
             }
         ))
-    )
+    );
 }
 
 #[test]
@@ -113,7 +113,7 @@ fn it_works2() {
                 ))
             }
         ))
-    )
+    );
 }
 
 #[test]
@@ -143,5 +143,5 @@ fn it_works() {
                 ))
             }
         ))
-    )
+    );
 }

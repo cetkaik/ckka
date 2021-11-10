@@ -60,7 +60,7 @@ pub fn parse_numeral(s: &str) -> IResult<&str, i64> {
 pub fn parse_arabic_numeral(s: &str) -> IResult<&str, i64> {
     let (rest, neg) = opt(char('-'))(s)?;
     let (rest, num_vec) = many1(one_of("0123456789"))(rest)?;
-    let acc = i64::from_str_radix(&num_vec.into_iter().collect::<String>(), 10);
+    let acc = num_vec.into_iter().collect::<String>().parse::<i64>();
     match acc {
         Ok(num) => Ok((rest, if neg.is_some() { -num } else { num })),
         Err(_) => Err(Err::Error(Error::new(rest, ErrorKind::Verify))), /* unparsable arabic numeral */
@@ -93,10 +93,10 @@ pub fn parse_ckka(s: &str) -> Result<CKKA, String> {
         }
 
         if is_body {
-            body.push_str(&l);
+            body.push_str(l);
             body.push('\n');
         } else {
-            header.push_str(&l);
+            header.push_str(l);
             header.push('\n');
         }
     }
