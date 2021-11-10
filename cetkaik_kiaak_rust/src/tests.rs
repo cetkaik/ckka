@@ -84,6 +84,67 @@ fn sample2() {
     .unwrap();
 }
 
+#[test]
+fn sample3() {
+    use super::*;
+    parse_ckka(
+        r#"
+        {始時:2021-11-06T14:04:02.430Z}
+        {一位色:赤}
+        {終時:2021-11-06T14:30:35.476Z}
+        [jekto.vatimeliju] [Rhemestry]
+        LE片LILU橋二    KAU片KAIKY無撃裁
+        NI片TITU無撃裁    MAU片MAIMY橋二
+        KE片NE無撃裁    XAI片XY無撃裁
+        KA片KIKY橋三 手巫    KAI片KY無撃裁 手筆
+        NE片NI無撃裁    ZO皇[ZY]ZAIZAU
+        ZI片ZAI無撃裁 手船    CAI片CAU無撃裁
+        ZAU皇ZAI[ZY]TY    TAI片ZAIZAU無撃裁
+        ZAI片ZAUZIA橋二 手王
+        
+        或為(王)終季 手五
+            春終
+        
+        MAU片MAIMY橋三    PE片PIPU無撃裁
+        NAI片TAITY無撃裁    LE片TEZE橋三
+        CAI片CAU無撃裁    ZO皇[XY]CAI
+        TIA片ZAU無撃裁    ZI片ZAIZAU橋一 手将
+        XIA片ZAU無撃裁 手船    ZA片TENE無撃裁
+        CAI皇[MAU]CAUXIA    PU片XU無撃裁
+        PAU片CAUCAI橋三    XU片XAICAI橋二 手巫
+        XAU片CAI無撃裁 手巫    PA片PIPU橋三
+        LAU片NAU無撃裁    PU片PAIPIA橋二 手筆
+        
+        或為(地心)終季 手七
+            夏終
+        
+        LE片LILU橋四    PAU片PAIPY無撃裁
+        ZO皇[ZU]ZIZE    ZAI片ZI無撃裁 手船
+        TE片ZIXU橋二    ZIA片XAUCAU無撃裁
+        XA片ZATE無撃裁    PY片XY無撃裁
+        XI片XUXY無撃裁 手巫    CAI片XAIXY無撃裁 手兵
+        ZA片TENE無撃裁    ZI片CICA橋無此無
+        TA片TEZI水二此無    ZI片CICA橋二 手車
+        ME片MACA橋三 手船    MAU片MAIMY橋三
+        ZE皇[XI]CIMU    XAI片XYXU無撃裁 手虎
+        XE片CIXU橋四 手兵    XY片XU無撃裁 手虎
+        黒船CO    MU皇CO[CY]CAI
+        赤巫MO    MAI片MYMO無撃裁 手巫
+        CAI皇[CY]MOMU    CAU片MAU無撃裁
+        CO片MOMY橋四 手弓    MO片MY無撃裁 手船
+        CA片CIXU橋四 手兵    黒虎CAI
+        MU皇[CO]XY    LAU片LAILY橋五
+        XU片MYMAU橋四 手王
+        
+        或為(馬弓兵)(王)(戦集)(助友)終季 手十六
+            秋終
+        
+        
+        星一周"#,
+    )
+    .unwrap();
+}
+
 /*
 #[test]
 fn sample3() {

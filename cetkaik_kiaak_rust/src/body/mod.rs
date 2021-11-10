@@ -39,8 +39,14 @@ pub fn parse_body_elem(s: &str) -> IResult<&str, Elem> {
 }
 
 #[derive(Eq, PartialEq, Clone, Debug)]
+pub enum HandAuthor {
+    Unnamed,
+    Name(String),
+}
+
+#[derive(Eq, PartialEq, Clone, Debug)]
 pub struct HandCreation {
-    pub player_name: String,
+    pub player_name: HandAuthor,
     pub hands: HashSet<String>,
 }
 
@@ -86,7 +92,7 @@ pub fn parse_capture_comment(s: &str) -> IResult<&str, cetkaik_core::Profession>
 }
 
 /// ```
-/// use cetkaik_kiaak::body::{parse_ty_mok_ta_xot, HandCreation, Action};
+/// use cetkaik_kiaak::body::{parse_ty_mok_ta_xot, HandCreation, Action, HandAuthor};
 /// use cetkaik_core::Profession;
 /// use cetkaik_core::absolute::*;
 /// use std::collections::HashSet;
@@ -96,7 +102,7 @@ pub fn parse_capture_comment(s: &str) -> IResult<&str, cetkaik_core::Profession>
 ///     Ok((
 ///         "",
 ///         (HandCreation {
-///             player_name: String::from("SY"),
+///             player_name: HandAuthor::Name(String::from("SY")),
 ///             hands: HashSet::from_iter(vec![String::from("獣"), String::from("同色馬弓兵")].into_iter())
 ///         }, Action::TyMok)
 ///     ))
@@ -106,7 +112,7 @@ pub fn parse_capture_comment(s: &str) -> IResult<&str, cetkaik_core::Profession>
 ///     Ok((
 ///         "",
 ///         (HandCreation {
-///             player_name: String::from("SY"),
+///             player_name: HandAuthor::Name(String::from("SY")),
 ///             hands: HashSet::from_iter(vec![String::from("獣"), String::from("同色馬弓兵")].into_iter())
 ///         }, Action::TaXot(10))
 ///     ))
@@ -116,7 +122,7 @@ pub fn parse_capture_comment(s: &str) -> IResult<&str, cetkaik_core::Profession>
 ///     Ok((
 ///         "",
 ///         (HandCreation {
-///             player_name: String::from("SY"),
+///             player_name: HandAuthor::Name(String::from("SY")),
 ///             hands: HashSet::from_iter(vec![String::from("獣"), String::from("同色馬弓兵")].into_iter())
 ///         }, Action::TaXot(20))
 ///     ))
@@ -136,7 +142,7 @@ pub fn parse_ty_mok_ta_xot(s: &str) -> IResult<&str, (HandCreation, Action)> {
 }
 
 /// ```
-/// use cetkaik_kiaak::body::{parse_hand_creation, HandCreation};
+/// use cetkaik_kiaak::body::{parse_hand_creation, HandCreation, HandAuthor};
 /// use cetkaik_core::Profession;
 /// use cetkaik_core::absolute::*;
 /// use std::collections::HashSet;
@@ -146,21 +152,43 @@ pub fn parse_ty_mok_ta_xot(s: &str) -> IResult<&str, (HandCreation, Action)> {
 ///     Ok((
 ///         "",
 ///         HandCreation {
-///             player_name: String::from("SY"),
+///             player_name: HandAuthor::Name(String::from("SY")),
 ///             hands: HashSet::from_iter(vec![String::from("獣"), String::from("同色馬弓兵")].into_iter())
+///         }
+///     ))
+/// );
+///
+/// assert_eq!(
+///     parse_hand_creation("或為(馬弓兵)(王)(戦集)(助友)而手十六"),
+///     Ok((
+///         "而手十六",
+///         HandCreation {
+///             player_name: HandAuthor::Unnamed,
+///             hands: HashSet::from_iter(vec![
+///                 String::from("馬弓兵"),
+///                 String::from("王"),
+///                 String::from("戦集"),
+///                 String::from("助友"),
+///             ].into_iter())
 ///         }
 ///     ))
 /// );
 /// ```
 pub fn parse_hand_creation(s: &str) -> IResult<&str, HandCreation> {
-    let (rest, player_name) = super::parse_braced_string(s, '[', ']')?;
+    let (rest, player_name) = alt((
+        map(tag("或"), |_| crate::body::HandAuthor::Unnamed),
+        map(
+            |s| super::parse_braced_string(s, '[', ']'),
+            |name| crate::body::HandAuthor::Name(name.to_owned()),
+        ),
+    ))(s)?;
     let (rest, _) = char('為')(rest)?;
     let (rest, hands) = many1(|s| super::parse_braced_string(s, '(', ')'))(rest)?;
 
     Ok((
         rest,
         HandCreation {
-            player_name: player_name.to_owned(),
+            player_name,
             hands: hands
                 .into_iter()
                 .map(std::borrow::ToOwned::to_owned)

@@ -29,7 +29,7 @@ dependencies = [
 
 [[package]]
 name = "cetkaik_kiaak"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "big_s",
  "cetkaik_core",
