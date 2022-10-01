@@ -6,6 +6,11 @@
 
 jekto.vatimeliju
 
+## 現実に存在する実装
+
+- このリポジトリの Rust 実装
+- cerke_online の吐くやつだけに対処している cerke_online_kiaak_parser https://github.com/sozysozbot/cerke_online_kiaak_parser
+
 ## 概要
 
 この仕様書は、「机戦」「セーケ」「パイグ将棋」「セッカイク」などの名で知られている遊戯の棋譜を記述するための標準形式として、CKKA (cet2 kaik kia1 ak1) ファイルの仕様を定めるものである。この仕様は、人間が自然に書くことができ、かつ現状存在する複数の棋譜機構・棋譜データとの互換性をなるべく保つことのできるように定めたものである。
